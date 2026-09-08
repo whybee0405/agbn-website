@@ -1,0 +1,559 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@config '../../../tailwind.config.mjs';
+
+@custom-variant sm (@media (width >= theme(--breakpoint-sm)));
+@custom-variant md (@media (width >= theme(--breakpoint-md)));
+@custom-variant lg (@media (width >= theme(--breakpoint-lg)));
+@custom-variant xl (@media (width >= theme(--breakpoint-xl)));
+@custom-variant 2xl (@media (width >= theme(--breakpoint-2xl)));
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: unset;
+    font-size: unset;
+  }
+}
+
+@plugin "@tailwindcss/typography";
+
+@source inline("lg:col-span-4");
+@source inline("lg:col-span-6");
+@source inline("lg:col-span-8");
+@source inline("lg:col-span-12");
+@source inline("border-border");
+@source inline("bg-card");
+@source inline("border-error");
+@source inline("bg-error/30");
+@source inline("border-success");
+@source inline("bg-success/30");
+@source inline("border-warning");
+@source inline("bg-warning/30");
+
+@theme {
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 86rem;
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-data), ui-monospace, monospace;
+
+  /* AGBN Brand DNA §5.2 — the only colours allowed on this site */
+  --color-navy: #0a1d37;
+  --color-midnight: #061426;
+  --color-gold: #cca43b;
+  --color-ember: #e5b945;
+  --color-savanna: #1f7a4d;
+  --color-clay: #b85c2e;
+  --color-slate-900: #101820;
+  --color-slate-500: #5b6b7a;
+  --color-slate-200: #dce3ea;
+  --color-slate-50: #f6f8fa;
+  --color-white: #ffffff;
+
+  /* --------------------------------------------------------------------
+     Type scale — Brand DNA §5.3, expressed fluidly.
+     Each step is at least 1.25x the one below it at every viewport, so the
+     hierarchy never flattens out the way a fixed sm:/lg: ladder does.
+     -------------------------------------------------------------------- */
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+  --text-body-s: 0.875rem;
+  --text-body-s--line-height: 1.55;
+  --text-body-m: 1rem;
+  --text-body-m--line-height: 1.6;
+  --text-body-l: clamp(1.0625rem, 0.99rem + 0.31vw, 1.1875rem);
+  --text-body-l--line-height: 1.6;
+  --text-lede: clamp(1.125rem, 1.02rem + 0.44vw, 1.375rem);
+  --text-lede--line-height: 1.5;
+  --text-display-s: clamp(1.375rem, 1.24rem + 0.56vw, 1.75rem);
+  --text-display-s--line-height: 1.25;
+  --text-display-m: clamp(1.75rem, 1.5rem + 1.05vw, 2.5rem);
+  --text-display-m--line-height: 1.15;
+  --text-display-l: clamp(2.25rem, 1.79rem + 1.96vw, 3.625rem);
+  --text-display-l--line-height: 1.08;
+  --text-display-xl: clamp(2.75rem, 1.96rem + 3.36vw, 5rem);
+  --text-display-xl--line-height: 1.02;
+
+  /* Clash Display is geometric and wide; display sizes need negative
+     tracking to stop reading like a default UI sans. */
+  --tracking-display: -0.02em;
+  --tracking-display-tight: -0.032em;
+
+  /* Vertical rhythm. Sections vary deliberately instead of every block
+     landing on the same py-16 sm:py-20. */
+  --space-section-sm: clamp(3rem, 2.4rem + 2.5vw, 4.5rem);
+  --space-section: clamp(4rem, 3rem + 4.2vw, 7rem);
+  --space-section-lg: clamp(5.5rem, 4rem + 6.3vw, 10rem);
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer utilities {
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @variant sm {
+    .container {
+      max-width: var(--breakpoint-sm);
+    }
+  }
+
+  @variant md {
+    .container {
+      max-width: var(--breakpoint-md);
+      padding-inline: 2rem;
+    }
+  }
+
+  @variant lg {
+    .container {
+      max-width: var(--breakpoint-lg);
+    }
+  }
+
+  @variant xl {
+    .container {
+      max-width: var(--breakpoint-xl);
+    }
+  }
+
+  @variant 2xl {
+    .container {
+      max-width: var(--breakpoint-2xl);
+    }
+  }
+}
+
+/* ----------------------------------------------------------------------
+   Semantic tokens.
+
+   Surfaces come in four tones. Every section on the site picks one, which
+   is what keeps the page from flipping between light and dark at random.
+
+   `on-dark-muted` exists because Slate 500 (#5B6B7A) on Navy is ~2.6:1 and
+   fails WCAG AA. Muted text on dark surfaces is Slate 200 held back with
+   opacity instead — still an approved palette colour (Brand DNA §5.2), and
+   it clears AA comfortably.
+   ---------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  --surface-page: var(--color-white);
+  --surface-sunken: var(--color-slate-50);
+  --surface-raised: var(--color-white);
+  --surface-brand: var(--color-navy);
+  --surface-deep: var(--color-midnight);
+
+  --on-surface: var(--color-slate-900);
+  --on-surface-muted: var(--color-slate-500);
+  --on-dark: var(--color-white);
+  --on-dark-muted: color-mix(in srgb, var(--color-slate-200) 78%, transparent);
+
+  /* Clay (#B85C2E) is 4.28:1 on the Slate 50 surface, just under AA for the
+     small label sizes it is used at. Deepening it toward Slate 900 keeps it
+     recognisably Clay (Brand DNA §5.2) and lands at 5.3:1. */
+  --on-surface-accent: color-mix(in srgb, var(--color-clay) 82%, var(--color-slate-900));
+
+  /* Headings on a light surface are Navy. In dark mode the raised surface IS
+     Navy, so a hardcoded `text-navy` heading disappears into its own card. */
+  --on-surface-heading: var(--color-navy);
+
+  --hairline: var(--color-slate-200);
+  --hairline-dark: color-mix(in srgb, var(--color-white) 14%, transparent);
+
+  /* #B3261E is ~2.3:1 on Midnight, so error text on the dark bands (the footer
+     newsletter form) needs the light tint instead. */
+  --on-dark-error: #f2b8b5;
+
+  --background: var(--surface-page);
+  --foreground: var(--on-surface);
+  --card: var(--surface-raised);
+  --card-foreground: var(--on-surface);
+  --popover: var(--surface-raised);
+  --popover-foreground: var(--on-surface);
+  --primary: var(--color-navy);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-slate-50);
+  --secondary-foreground: var(--color-navy);
+  --muted: var(--color-slate-50);
+  --muted-foreground: var(--on-surface-muted);
+  --accent: var(--color-gold);
+  --accent-foreground: var(--color-navy);
+  --destructive: #b3261e;
+  --destructive-foreground: #ffffff;
+  --border: var(--hairline);
+  --input: var(--hairline);
+  --ring: var(--color-gold);
+  --radius: 0.625rem;
+  --success: var(--color-savanna);
+  --warning: var(--color-clay);
+  --error: #b3261e;
+}
+
+/* ----------------------------------------------------------------------
+   No `prefers-color-scheme: dark` override. Removed deliberately, 3 Sept 2026.
+
+   This site's identity is already half dark: the tone system alternates
+   Midnight and Navy bands against White and Slate 50 ones, and that
+   alternation IS the page rhythm. The dark-mode block mapped `page` and
+   `sunken` down onto the two dark surfaces, which meant `page` and `deep`
+   both resolved to #061426 — the same colour. Every section boundary
+   disappeared and all ten pages rendered as one continuous dark field, with
+   no light surface anywhere on the site.
+
+   An audit measured it: with the dark block active, every page was 100% dark
+   by section area. Without it, the homepage is ~59% dark and alternates.
+
+   Honouring an OS preference is not worth destroying the brand's tonal
+   structure, so the palette in `:root` is now the only palette. Restoring a
+   dark theme means giving `page`, `sunken` and `deep` genuinely distinct
+   luminances, not collapsing them onto each other.
+   ---------------------------------------------------------------------- */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+
+  --color-surface-page: var(--surface-page);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-brand: var(--surface-brand);
+  --color-surface-deep: var(--surface-deep);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-muted: var(--on-surface-muted);
+  --color-on-surface-accent: var(--on-surface-accent);
+  --color-on-surface-heading: var(--on-surface-heading);
+  --color-on-dark: var(--on-dark);
+  --color-on-dark-muted: var(--on-dark-muted);
+  --color-on-dark-error: var(--on-dark-error);
+  --color-hairline: var(--hairline);
+  --color-hairline-dark: var(--hairline-dark);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground min-h-[100dvh] flex flex-col font-sans;
+    font-size: var(--text-body-m);
+    line-height: var(--text-body-m--line-height);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  /* Keyboard focus is visible everywhere and never removed. Gold reads on
+     both the navy and the light surfaces, so one ring works site-wide. */
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-gold);
+    color: var(--color-navy);
+  }
+}
+
+@layer utilities {
+  /* Body copy stays inside a comfortable measure without every caller
+     remembering a max-w-* class. */
+  .measure {
+    max-width: 65ch;
+  }
+
+  .measure-tight {
+    max-width: 48ch;
+  }
+
+  /* Top and bottom read from separate custom properties so a caller can
+     override one edge with an inline `--section-pt` without getting into a
+     specificity fight with the shorthand. */
+  .section-y {
+    padding-top: var(--section-pt, var(--space-section));
+    padding-bottom: var(--section-pb, var(--space-section));
+  }
+
+  .section-y-sm {
+    padding-top: var(--section-pt, var(--space-section-sm));
+    padding-bottom: var(--section-pb, var(--space-section-sm));
+  }
+
+  .section-y-lg {
+    padding-top: var(--section-pt, var(--space-section-lg));
+    padding-bottom: var(--section-pb, var(--space-section-lg));
+  }
+
+  /*
+     Native select controls render the OS dropdown arrow, which is the one
+     piece of chrome on the site that ignores the type scale and the palette
+     entirely — it is why the filter rows read as unstyled next to everything
+     around them. This swaps it for a chevron drawn in Slate 500.
+
+     `appearance: none` removes the arrow but not the control, so keyboard
+     behaviour, the native option list and mobile pickers are all untouched.
+  */
+  .select-field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%235B6B7A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 0.7rem;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  /* Numbers, prices and stats use tabular figures so columns of data stop
+     shifting width between values. */
+  .tabular {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @keyframes network-line-draw {
+    from {
+      stroke-dashoffset: var(--line-length, 200);
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes network-node-in {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes network-node-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(0.85);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+  }
+
+  .agbn-line-draw {
+    stroke-dasharray: var(--line-length, 200);
+    stroke-dashoffset: var(--line-length, 200);
+    animation: network-line-draw 0.9s var(--ease-out-quint) forwards;
+    animation-delay: var(--line-delay, 0s);
+  }
+
+  .agbn-node-in {
+    animation: network-node-in 0.5s var(--ease-out-quint) backwards;
+    animation-delay: var(--node-delay, 0s);
+    transform-origin: center;
+  }
+
+  .agbn-node-pulse {
+    animation: network-node-pulse 1.8s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  /* --------------------------------------------------------------------
+     Hero parallax.
+
+     Scroll-driven CSS animations, not a scroll listener. These run off the
+     main thread, so they stay smooth while the browser is still decoding the
+     two hero images — which is exactly when a rAF-driven listener drops
+     frames. No JavaScript, and nothing to clean up.
+
+     Three layers already exist in the hero (photograph, network artwork,
+     copy). Giving each a different rate is what produces depth; a single
+     shifted image only reads as drift.
+
+     The back layer is pre-scaled so it has overflow to travel into. Without
+     that, translating a layer that exactly fills its box uncovers a strip at
+     the top edge. The mid layer needs no scale: its background is true black
+     and it is composited with `screen`, so its edges contribute nothing.
+
+     Everything is transform and opacity only — no layout properties.
+     -------------------------------------------------------------------- */
+  /*
+    Amplitudes are set by the DIFFERENCE between layers, not by each layer's
+    own travel — parallax is perceived relatively. The first version moved the
+    photo 17px and the artwork 15px at the same scroll offset: a 2px
+    differential, which is invisible. These values keep roughly 70px between
+    them across the range.
+
+    The back layer's scale is what bounds its travel. Peak displacement is 9%
+    of the box, so it needs at least 9% overflow on each edge, hence 1.22.
+    Under-scaling here uncovers a strip at the top edge mid-scroll.
+  */
+  /*
+    Both layers start at zero offset and diverge monotonically. An earlier
+    version started them at different offsets, which made them converge and
+    cross: the back/mid gap ran -36px → -17px → +2px → +28px, so around 400px
+    of scroll the two layers momentarily aligned and the depth inverted.
+    Parallax reads as depth only while the gap grows in one direction.
+
+    Starting at zero also means the hero's first paint is the framing that was
+    actually composed, rather than a pre-offset version of it.
+
+    Scale bounds travel: peak displacement is 11% of the box, so the layer
+    needs more than 11% overflow per edge — 1.26 gives 13%.
+  */
+  @keyframes agbn-hero-back {
+    from {
+      transform: scale(1.26) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale(1.26) translate3d(0, 11%, 0);
+    }
+  }
+
+  @keyframes agbn-hero-mid {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(0, 4.5%, 0);
+    }
+  }
+
+  /*
+    The lift is linear across the whole range, but the fade is held back until
+    38%. Fading from the first pixel of scroll meant the headline was already
+    30% transparent at 200px — still centred on screen, still being read.
+    Copy should not start dissolving while it is the thing you are looking at.
+  */
+  @keyframes agbn-hero-fore {
+    0% {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+    38% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate3d(0, -14%, 0);
+      opacity: 0;
+    }
+  }
+
+  /*
+    Gated on @supports so browsers without scroll-driven animations get a
+    static hero rather than a broken one, and on reduced-motion because
+    parallax is a common trigger for motion sickness (WCAG 2.3.3).
+
+    `linear` is deliberate: the animation is tied to scroll position, so any
+    easing would decouple the layers from the user's own movement.
+  */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .agbn-hero-layer {
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: scroll(root block);
+        /* Ends as the hero clears the viewport; past that there is nothing
+           left to parallax and continuing would move offscreen pixels. */
+        animation-range: 0 42rem;
+        will-change: transform;
+      }
+
+      .agbn-hero-back {
+        animation-name: agbn-hero-back;
+      }
+      .agbn-hero-mid {
+        animation-name: agbn-hero-mid;
+      }
+      .agbn-hero-fore {
+        animation-name: agbn-hero-fore;
+        will-change: transform, opacity;
+      }
+    }
+  }
+
+  /* Scroll reveal. Content is visible by default and only hidden once the
+     Reveal island has hydrated and confirmed motion is wanted, so nothing
+     is ever stranded invisible with JS off. */
+  [data-reveal='pending'] {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+
+  [data-reveal='shown'] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.7s var(--ease-out-expo),
+      transform 0.7s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-reveal='pending'] {
+    opacity: 1;
+    transform: none;
+  }
+}

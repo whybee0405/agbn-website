@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - '5443:5432'
+    environment:
+      POSTGRES_USER: agbn
+      POSTGRES_PASSWORD: agbn
+      POSTGRES_DB: agbn
+    volumes:
+      - data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U agbn -d agbn']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    ports:
+      - '3030:3000'
+    env_file:
+      - .env
+    environment:
+      # Overrides for the compose network — .env's host-facing values (5443,
+      # localhost:3000) don't apply once this runs inside the network.
+      DATABASE_URL: postgresql://agbn:agbn@postgres:5432/agbn
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3030
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - web_node_modules:/app/node_modules
+      - web_next:/app/.next
+
+volumes:
+  data:
+  web_node_modules:
+  web_next:

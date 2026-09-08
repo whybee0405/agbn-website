@@ -1,0 +1,18 @@
+# Dev-mode container: fast to build, no build-time DB dependency (unlike a
+# production multi-stage build, which would need Postgres reachable while the
+# image itself is being built). docker-compose overlays the live source and a
+# named volume for node_modules on top of this.
+FROM node:22-alpine
+
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]

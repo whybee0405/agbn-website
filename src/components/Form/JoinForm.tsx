@@ -1,0 +1,138 @@
+'use client'
+
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useSearchParams } from 'next/navigation'
+
+import { submitJoin } from '@/app/(frontend)/actions'
+import { joinSchema, type JoinInput } from '@/lib/validation'
+import { FormField } from './FormField'
+import { FormSuccess } from './FormSuccess'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { trackEvent } from '@/components/Analytics'
+
+type Tier = { id: string; name: string }
+
+export const JoinForm: React.FC<{ tiers: Tier[] }> = ({ tiers }) => {
+  const searchParams = useSearchParams()
+  const [done, setDone] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [started, setStarted] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<JoinInput>({
+    resolver: zodResolver(joinSchema),
+    defaultValues: { selectedTier: searchParams.get('tier') || '' },
+  })
+
+  if (done) {
+    return (
+      <FormSuccess
+        title="You're in the queue."
+        message="Thanks for applying. The AGBN team will reach out within two business days to confirm your tier and get you set up."
+      />
+    )
+  }
+
+  const onSubmit = async (data: JoinInput) => {
+    setFormError(null)
+    const result = await submitJoin(data)
+    if (!result.success) {
+      setFormError(result.message)
+      if (result.fieldErrors) {
+        for (const [field, message] of Object.entries(result.fieldErrors)) {
+          setError(field as keyof JoinInput, { message })
+        }
+      }
+      return
+    }
+    trackEvent('Join Completed')
+    setDone(true)
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      onFocus={() => {
+        if (!started) {
+          trackEvent('Join Started')
+          setStarted(true)
+        }
+      }}
+      className="space-y-5"
+      noValidate
+    >
+      <FormField label="Full name" htmlFor="join-name" required error={errors.name?.message}>
+        <Input
+          id="join-name"
+          autoComplete="name"
+          aria-invalid={errors.name ? true : undefined}
+          aria-describedby={errors.name ? 'join-name-error' : undefined}
+          {...register('name')}
+        />
+      </FormField>
+      <FormField label="Email address" htmlFor="join-email" required error={errors.email?.message}>
+        <Input
+          id="join-email"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          aria-invalid={errors.email ? true : undefined}
+          aria-describedby={errors.email ? 'join-email-error' : undefined}
+          {...register('email')}
+        />
+      </FormField>
+      <FormField label="Phone number" htmlFor="join-phone" required error={errors.phone?.message}>
+        <Input
+          id="join-phone"
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
+          aria-invalid={errors.phone ? true : undefined}
+          aria-describedby={errors.phone ? 'join-phone-error' : undefined}
+          {...register('phone')}
+        />
+      </FormField>
+      <FormField label="Country (optional)" htmlFor="join-country" error={errors.country?.message}>
+        <Input id="join-country" autoComplete="country-name" {...register('country')} />
+      </FormField>
+      {tiers.length > 0 && (
+        <FormField label="Which tier interests you?" htmlFor="join-tier">
+          <select
+            id="join-tier"
+            {...register('selectedTier')}
+            className="h-11 w-full rounded-md border border-input bg-surface-raised px-3.5 text-base text-on-surface transition-colors hover:border-on-surface-muted md:text-body-s"
+          >
+            <option value="">Not sure yet</option>
+            {tiers.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </FormField>
+      )}
+      <FormField label="Anything else? (optional)" htmlFor="join-message" error={errors.message?.message}>
+        <Textarea id="join-message" rows={4} {...register('message')} />
+      </FormField>
+      {formError && (
+        <p role="alert" className="text-body-s text-error">
+          {formError}
+        </p>
+      )}
+      <Button type="submit" variant="gold" size="lg" loading={isSubmitting} className="w-full">
+        Apply to join
+      </Button>
+      <p className="text-caption text-on-surface-muted">
+        This is a membership application, not a checkout. Our team follows up to confirm your
+        tier and payment.
+      </p>
+    </form>
+  )
+}

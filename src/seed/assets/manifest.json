@@ -1,0 +1,139 @@
+{
+  "$comment": [
+    "Provenance record for the seed imagery. Replaces scripts/generate-seed-images.mjs,",
+    "which regenerated navy 'AGBN — PLACEHOLDER IMAGE' gradients and would silently",
+    "overwrite these files if it were ever run again.",
+    "",
+    "SCOPE: this file covers the CMS seed imagery only. The homepage hero and",
+    "gallery are separate curated files under public/home/ and are documented in",
+    "src/components/HomeGallery/index.tsx. They are generated under the same rules",
+    "and carry the same interim status.",
+    "",
+    "STATUS: every image below is AI-generated and stands in for photography AGBN has",
+    "not commissioned yet. Brand DNA §5.5 requires real photography. These images are",
+    "closer to that bar than the gradients were, but they do not meet it. Real",
+    "photography lands in the gallery section; replace these as it arrives and drop the",
+    "matching entry's \"generated\" flag when you do.",
+    "",
+    "Two rules learned the hard way, worth keeping if you regenerate anything:",
+    "1. z_image has no negative conditioning. Writing 'no handshake' PRODUCED a",
+    "   handshake — the one composition Brand DNA §5.5 names explicitly. Never phrase a",
+    "   constraint as an exclusion; positively describe what is in frame instead.",
+    "2. Give every person in a frame a distinct, physically separate task. That is what",
+    "   structurally prevents the handshake / posed-group compositions, not asking for",
+    "   their absence."
+  ],
+  "model": "z_image",
+  "provider": "higgsfield",
+  "aspectRatio": "16:9",
+  "sourceResolution": "2048x1152",
+  "storedAs": "1600x900 JPEG q82",
+  "generatedOn": "2026-09-03",
+  "images": [
+    {
+      "file": "seed-1.jpg",
+      "subject": "Mining & Manganese",
+      "country": "Zambia",
+      "generated": true,
+      "alt": "Two miners at a conveyor loading point on a manganese site in Zambia, one pointing along the belt while the other checks a hydraulic line."
+    },
+    {
+      "file": "seed-2.jpg",
+      "subject": "Healthcare Access",
+      "country": "Rwanda",
+      "generated": true,
+      "alt": "A nurse writing in a wall register in the corridor of a rural health centre in Rwanda, with a woman and child waiting on a bench."
+    },
+    {
+      "file": "seed-3.jpg",
+      "subject": "Construction & Infrastructure",
+      "country": "Tanzania",
+      "generated": true,
+      "alt": "A steel fixer tying rebar on a concrete slab at a mid-rise construction site in Dar es Salaam, Tanzania."
+    },
+    {
+      "file": "seed-4.jpg",
+      "subject": "Technology & Digital",
+      "country": "Kenya",
+      "generated": true,
+      "alt": "A developer working at a multi-monitor desk in a Nairobi technology office while a colleague writes on a whiteboard."
+    },
+    {
+      "file": "seed-5.jpg",
+      "subject": "Agriculture & Agribusiness",
+      "country": "Ghana",
+      "generated": true,
+      "alt": "A farmer turning grain on a raised drying tray on a smallholding in Ghana, with a second farmer carrying a basket along the path behind."
+    },
+    {
+      "file": "seed-6.jpg",
+      "subject": "Green Energy",
+      "country": "Morocco",
+      "generated": true,
+      "alt": "A maintenance technician walking a row of dust-filmed photovoltaic panels at a solar installation in southern Morocco."
+    },
+    {
+      "file": "seed-7.jpg",
+      "subject": "Logistics & Trade",
+      "country": "Côte d'Ivoire",
+      "generated": true,
+      "alt": "A dock worker directing a container truck on the quay at the port of Abidjan, Côte d'Ivoire."
+    },
+    {
+      "file": "seed-8.jpg",
+      "subject": "Finance & Investment",
+      "country": "Nigeria",
+      "generated": true,
+      "alt": "A woman reading a printed document at the window of a Lagos office, with the city beyond and a colleague working through files behind her."
+    },
+    {
+      "file": "seed-9.jpg",
+      "subject": "Professional Services",
+      "country": "Senegal",
+      "generated": true,
+      "alt": "A consultant reading one of a wall of pinned documents in a small office in Dakar, Senegal."
+    },
+    {
+      "file": "seed-10.jpg",
+      "subject": "Manufacturing",
+      "country": "Ethiopia",
+      "generated": true,
+      "alt": "A machine operator at an industrial sewing line in a garment factory in Hawassa, Ethiopia."
+    },
+    {
+      "file": "seed-11.jpg",
+      "subject": "AGBN Network Event",
+      "country": "Botswana",
+      "generated": true,
+      "alt": "Delegates talking in small groups at an AGBN networking reception in Gaborone, Botswana."
+    },
+    {
+      "file": "seed-12.jpg",
+      "subject": "AGBN Roundtable",
+      "country": "Namibia",
+      "generated": true,
+      "alt": "Members seated around the table at an AGBN roundtable in Windhoek, Namibia, one speaker mid-gesture."
+    },
+    {
+      "file": "seed-13.jpg",
+      "subject": "Member Success Story",
+      "country": "Uganda",
+      "generated": true,
+      "alt": "A business owner writing in a stock ledger at the counter of her hardware supply shop in Kampala, Uganda."
+    },
+    {
+      "file": "seed-14.jpg",
+      "subject": "Deal Story",
+      "country": "Zimbabwe",
+      "generated": true,
+      "alt": "A logistics operator walking a row of stacked pallets in his yard in Harare, Zimbabwe, clipboard in hand."
+    },
+    {
+      "file": "seed-15.jpg",
+      "subject": "Country Spotlight",
+      "country": "Mozambique",
+      "generated": true,
+      "alt": "Early morning in a working commercial district of Maputo, Mozambique, with a vendor setting up a street stall."
+    }
+  ]
+}
