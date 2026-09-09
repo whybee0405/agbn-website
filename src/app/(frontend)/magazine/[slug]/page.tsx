@@ -8,6 +8,8 @@ import { ArticleHero } from '@/components/ArticleHero'
 import RichText from '@/components/RichText'
 import { RelatedItems, type RelatedItem } from '@/components/RelatedItems'
 import { generateMeta } from '@/utilities/generateMeta'
+import { PUBLISHED_MAGAZINE_AVAILABLE, VERIFIED_MEMBER_STORIES_AVAILABLE } from '@/lib/content-policy'
+import { StoriesPending } from '@/components/StoriesPending'
 
 export const revalidate = 300
 
@@ -39,6 +41,7 @@ const queryPostBySlug = cache(async (slug: string) => {
 })
 
 export async function generateStaticParams() {
+  if (!PUBLISHED_MAGAZINE_AVAILABLE) return []
   const payload = await getPayload({ config: configPromise })
   const posts = await payload.find({
     collection: 'posts',
@@ -50,9 +53,11 @@ export async function generateStaticParams() {
 }
 
 export default async function PostPage({ params: paramsPromise }: Args) {
+  if (!PUBLISHED_MAGAZINE_AVAILABLE) return notFound()
   const { slug } = await paramsPromise
   const post = await queryPostBySlug(slug)
   if (!post) return notFound()
+  if (!VERIFIED_MEMBER_STORIES_AVAILABLE && post.pillar === 'deal-stories') return <StoriesPending />
 
   const sectorName = typeof post.sector === 'object' ? post.sector?.name : undefined
   const authorNames = (post.populatedAuthors || [])
@@ -81,7 +86,7 @@ export default async function PostPage({ params: paramsPromise }: Args) {
       depth: 1,
       limit: 3 - samePillar.docs.length,
       overrideAccess: false,
-      where: { id: { not_in: excludeIds } },
+      where: { id: { not_in: excludeIds }, ...(!VERIFIED_MEMBER_STORIES_AVAILABLE ? { pillar: { not_equals: 'deal-stories' } } : {}) },
       sort: '-publishedAt',
     })
     return { docs: [...samePillar.docs, ...backfill.docs], allSamePillar: backfill.docs.length === 0 }
@@ -139,7 +144,9 @@ export default async function PostPage({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
+  if (!PUBLISHED_MAGAZINE_AVAILABLE) return { robots: { index: false, follow: false } }
   const { slug } = await paramsPromise
   const post = await queryPostBySlug(slug)
+  if (!VERIFIED_MEMBER_STORIES_AVAILABLE && post?.pillar === 'deal-stories') return { title: 'Member stories', description: 'Verified member stories will be shared here when available.', robots: { index: false, follow: true }, openGraph: { title: 'AGBN member stories', description: 'Verified stories will be shared when available.' } }
   return generateMeta({ doc: post })
 }

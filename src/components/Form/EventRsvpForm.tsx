@@ -10,6 +10,7 @@ import { FormField } from './FormField'
 import { FormSuccess } from './FormSuccess'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { runFormAction } from '@/lib/form-action'
 
 type Props = {
   eventId: string
@@ -37,7 +38,7 @@ export const EventRsvpForm: React.FC<Props> = ({ eventId, rsvpStatus }) => {
         message={
           kind === 'rsvp'
             ? 'A confirmation has been logged for this event. See you there.'
-            : "Registration for this event isn't open yet. We'll email you the moment it is."
+            : 'Your interest has been recorded. The team can contact you if registration becomes available.'
         }
       />
     )
@@ -45,7 +46,7 @@ export const EventRsvpForm: React.FC<Props> = ({ eventId, rsvpStatus }) => {
 
   const onSubmit = async (data: EventRsvpInput) => {
     setFormError(null)
-    const result = await submitEventRsvp({ ...data, eventId, kind })
+    const result = await runFormAction(() => submitEventRsvp({ ...data, eventId, kind }))
     if (!result.success) {
       setFormError(result.message)
       if (result.fieldErrors) {
@@ -67,6 +68,7 @@ export const EventRsvpForm: React.FC<Props> = ({ eventId, rsvpStatus }) => {
           id="rsvp-name"
           autoComplete="name"
           aria-invalid={errors.name ? true : undefined}
+          aria-describedby={errors.name ? 'rsvp-name-error' : undefined}
           {...register('name')}
         />
       </FormField>
@@ -77,6 +79,7 @@ export const EventRsvpForm: React.FC<Props> = ({ eventId, rsvpStatus }) => {
           inputMode="email"
           autoComplete="email"
           aria-invalid={errors.email ? true : undefined}
+          aria-describedby={errors.email ? 'rsvp-email-error' : undefined}
           {...register('email')}
         />
       </FormField>

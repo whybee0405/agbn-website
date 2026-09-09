@@ -16,16 +16,17 @@ import { XIcon } from 'lucide-react'
  */
 export const StickyMobileCTA: React.FC = () => {
   const pathname = usePathname()
+  return pathname === '/' ? <HomeStickyCTA /> : null
+}
+
+const HomeStickyCTA: React.FC = () => {
   const sentinelRef = useRef<HTMLDivElement | null>(null)
   const [pastHero, setPastHero] = useState(false)
+  const [coveredBySection, setCoveredBySection] = useState(false)
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
-    setDismissed(false)
-  }, [pathname])
-
-  useEffect(() => {
-    const el = sentinelRef.current
+    const el = document.getElementById('home-hero') || sentinelRef.current
     if (!el) return
 
     const observer = new IntersectionObserver(
@@ -36,7 +37,28 @@ export const StickyMobileCTA: React.FC = () => {
     return () => observer.disconnect()
   }, [])
 
-  const visible = pastHero && !dismissed
+  useEffect(() => {
+    const sections = ['how-it-works', 'home-app-preview']
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => section !== null)
+    if (sections.length === 0) return
+
+    const visible = new Set<HTMLElement>()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) visible.add(entry.target as HTMLElement)
+          else visible.delete(entry.target as HTMLElement)
+        })
+        setCoveredBySection(visible.size > 0)
+      },
+      { threshold: 0.12 },
+    )
+    sections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [])
+
+  const visible = pastHero && !coveredBySection && !dismissed
   const hiddenFromAT = !visible
 
   return (

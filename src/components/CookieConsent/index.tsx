@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { getConsent, setConsent } from '@/lib/consent'
+import React from 'react'
+import { setConsent } from '@/lib/consent'
+import { useConsent } from '@/hooks/useConsent'
 
 // Plausible is cookieless, so it needs no consent gate. This banner only
 // appears when GA4 (which does use cookies) is actually configured —
@@ -9,18 +10,11 @@ import { getConsent, setConsent } from '@/lib/consent'
 const GA4_ENABLED = Boolean(process.env.NEXT_PUBLIC_GA4_ID)
 
 export const CookieConsent: React.FC = () => {
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    if (!GA4_ENABLED) return
-    if (!getConsent()) setVisible(true)
-  }, [])
-
-  if (!GA4_ENABLED || !visible) return null
+  const consent = useConsent()
+  if (!GA4_ENABLED || consent !== null) return null
 
   const decide = (value: 'accepted' | 'declined') => {
     setConsent(value)
-    setVisible(false)
   }
 
   return (

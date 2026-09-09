@@ -1,12 +1,8 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import Link from 'next/link'
-import React from 'react'
-
 import type { Footer as FooterType, SiteSetting } from '@/payload-types'
-
 import { Logo } from '@/components/Logo/Logo'
 import { NavLink } from '@/components/NavLink'
-import { NetworkMap } from '@/components/NetworkMap'
 import { NewsletterForm } from '@/components/Form/NewsletterForm'
 
 const SOCIAL_LABELS: Record<string, string> = {
@@ -18,90 +14,71 @@ const SOCIAL_LABELS: Record<string, string> = {
 }
 
 export async function Footer() {
-  const footerData = (await getCachedGlobal('footer', 1)()) as FooterType
-  const siteSettings = (await getCachedGlobal('site-settings', 1)()) as SiteSetting
-
-  const linkGroups = footerData?.linkGroups || []
-
+  const [footer, settings] = await Promise.all([
+    getCachedGlobal('footer', 1)() as Promise<FooterType>,
+    getCachedGlobal('site-settings', 1)() as Promise<SiteSetting>,
+  ])
   return (
     <footer className="mt-auto bg-surface-deep text-on-dark">
-      <div className="container pt-10">
-        <NetworkMap variant="divider" className="opacity-60" />
-      </div>
-
-      <div className="container grid gap-x-8 gap-y-12 pb-14 pt-12 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="lg:col-span-2">
-          <Link href="/" aria-label="AGBN home" className="inline-block">
-            <Logo variant="gold" className="h-8 w-auto" />
-          </Link>
-          {siteSettings?.tagline && (
-            /* Was `text-slate-500` on midnight, roughly 2.4:1. */
-            <p className="mt-5 max-w-xs text-body-s text-on-dark-muted">{siteSettings.tagline}</p>
-          )}
-
-          {siteSettings?.socialLinks && siteSettings.socialLinks.length > 0 && (
-            <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-2">
-              {siteSettings.socialLinks.map((social, i) => (
-                <li key={i}>
-                  <a
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-body-s text-on-dark-muted underline decoration-transparent underline-offset-4 transition-[color,text-decoration-color] hover:text-white hover:decoration-gold"
-                  >
-                    {SOCIAL_LABELS[social.platform] || social.platform}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        {linkGroups.map((group, i) => (
-          <nav key={i} aria-label={group.groupTitle ?? undefined}>
-            <h2 className="text-caption font-semibold uppercase tracking-[0.16em] text-gold">
-              {group.groupTitle}
-            </h2>
-            <ul className="mt-5 space-y-3">
-              {(group.links || []).map((item, j) => (
-                <li key={j}>
-                  <NavLink
-                    link={item.link}
-                    className="text-body-s text-on-dark-muted transition-colors hover:text-white"
-                  />
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ))}
-
-        <div>
-          <h2 className="text-caption font-semibold uppercase tracking-[0.16em] text-gold">
-            Stay in the loop
-          </h2>
-          <p className="mt-5 text-body-s text-on-dark-muted">
-            Deal stories and opportunities, straight to your inbox.
-          </p>
-          <div className="mt-4">
-            <NewsletterForm />
+      <div className="container">
+        <div className="grid items-center gap-7 border-b border-white/15 py-10 md:grid-cols-[1fr_1fr] lg:gap-24">
+          <div>
+            <h2 className="text-display-s font-medium">Keep your next move in view.</h2>
+            <p className="mt-2 text-body-s text-on-dark-muted">
+              News, opportunities and updates from AGBN.
+            </p>
           </div>
+          <NewsletterForm />
         </div>
-      </div>
-
-      <div className="border-t border-hairline-dark">
-        <div className="container flex flex-col-reverse gap-3 py-6 text-caption text-on-dark-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © {new Date().getFullYear()} Africa &amp; Global Business Network (AGBN). All rights
-            reserved.
-          </p>
-          <div className="flex gap-5">
-            <Link href="/privacy" className="transition-colors hover:text-white">
-              Privacy Policy
+        <div className="grid grid-cols-2 gap-x-8 gap-y-8 py-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+          <div className="col-span-2 lg:col-span-1">
+            <Link
+              href="/"
+              aria-label="AGBN home"
+              className="inline-flex min-h-11 items-center transition-transform duration-200 ease-out-expo hover:scale-[1.035]"
+            >
+              <Logo variant="gold" className="h-9 w-auto" />
             </Link>
-            <Link href="/terms" className="transition-colors hover:text-white">
-              Terms of Service
-            </Link>
+            <p className="mt-4 max-w-xs text-body-s text-on-dark-muted">
+              Business starts with people.
+              <br />
+              Opportunity starts with a connection.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-x-5">
+              {settings.socialLinks?.map((social, i) => (
+                <a
+                  key={i}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 items-center text-body-s text-on-dark-muted underline underline-offset-4 transition-[color,transform,text-decoration-color] duration-200 ease-out-expo hover:translate-x-1 hover:text-white"
+                >
+                  {SOCIAL_LABELS[social.platform] || social.platform}
+                </a>
+              ))}
+            </div>
           </div>
+          {footer.linkGroups?.map((group, i) => (
+            <nav key={i} aria-label={group.groupTitle || undefined}>
+              <h2 className="mb-3 text-caption font-semibold uppercase tracking-[0.14em] text-gold">
+                {group.groupTitle}
+              </h2>
+              <ul>
+                {group.links?.map((item, j) => (
+                  <li key={j}>
+                    <NavLink
+                      link={item.link}
+                      className="inline-flex min-h-11 items-center text-body-s text-on-dark-muted transition-[color,transform] duration-200 ease-out-expo hover:translate-x-1 hover:text-white"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-white/15 py-6 pb-24 text-caption text-on-dark-muted lg:pb-6">
+          <p>© {new Date().getFullYear()} Africa &amp; Global Business Network.</p>
+          <p>Connect. Refer. Earn. Grow.</p>
         </div>
       </div>
     </footer>

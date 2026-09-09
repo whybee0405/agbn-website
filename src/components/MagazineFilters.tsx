@@ -3,6 +3,7 @@
 import React, { useTransition } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { NetworkMap } from '@/components/NetworkMap'
+import { VERIFIED_MEMBER_STORIES_AVAILABLE } from '@/lib/content-policy'
 
 type Option = { label: string; value: string }
 
@@ -28,7 +29,7 @@ export const MagazineFilters: React.FC<Props> = ({ sectors }) => {
     if (value) params.set(key, value)
     else params.delete(key)
     startTransition(() => {
-      router.push(`${pathname}?${params.toString()}`)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
     })
   }
 
@@ -41,7 +42,7 @@ export const MagazineFilters: React.FC<Props> = ({ sectors }) => {
         onChange={(e) => updateParam('pillar', e.target.value)}
       >
         <option value="">All pillars</option>
-        {PILLARS.map((p) => (
+        {PILLARS.filter(p => VERIFIED_MEMBER_STORIES_AVAILABLE || p.value !== 'deal-stories').map((p) => (
           <option key={p.value} value={p.value}>
             {p.label}
           </option>

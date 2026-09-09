@@ -8,19 +8,15 @@ import { EmptyState } from '@/components/EmptyState'
 import { Media } from '@/components/Media'
 import { PageHeader, Section } from '@/components/Section'
 import { Button } from '@/components/ui/button'
+import { eventPresentation } from '@/utilities/eventPresentation'
+import { PUBLISHED_EVENTS_AVAILABLE } from '@/lib/content-policy'
 
 export const revalidate = 60
 
-const STATUS_LABEL: Record<string, string> = {
-  open: 'Open',
-  closed: 'Registration closed',
-  full: 'Full',
-}
-
-const dayFormatter = new Intl.DateTimeFormat('en-GB', { day: '2-digit' })
-const monthFormatter = new Intl.DateTimeFormat('en-GB', { month: 'short' })
-const yearFormatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric' })
-const timeFormatter = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' })
+const dayFormatter = new Intl.DateTimeFormat('en-GB', { day: '2-digit', timeZone: 'UTC' })
+const monthFormatter = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' })
+const yearFormatter = new Intl.DateTimeFormat('en-GB', { year: 'numeric', timeZone: 'UTC' })
+const timeFormatter = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short' })
 
 export default async function EventsPage() {
   const payload = await getPayload({ config: configPromise })
@@ -29,6 +25,7 @@ export default async function EventsPage() {
     depth: 1,
     limit: 50,
     sort: 'startDateTime',
+    where: { startDateTime: { greater_than_equal: new Date().toISOString() } },
     overrideAccess: false,
   })
 
@@ -36,7 +33,7 @@ export default async function EventsPage() {
     <>
       <PageHeader
         title="Events"
-        lede="Webinars, roundtables, and in-person meetups for the AGBN network."
+        lede="Networking-event announcements from the AGBN community."
       />
 
       {/*
@@ -45,10 +42,10 @@ export default async function EventsPage() {
         the same three-column tile layout.
       */}
       <Section tone="page" rhythm="md" rhythmTop="sm">
-        {events.docs.length === 0 ? (
+        {!PUBLISHED_EVENTS_AVAILABLE || events.docs.length === 0 ? (
           <EmptyState
-            title="No events scheduled yet."
-            body="We announce webinars and roundtables to members first. Join the network to hear about the next one."
+            title="The next networking event is being confirmed."
+            body="AGBN’s monthly networking event is planned at Hard Rock Cafe. The date and time are still to be confirmed."
             action={
               <Button asChild variant="gold">
                 <Link href="/join">Join AGBN</Link>
@@ -59,8 +56,7 @@ export default async function EventsPage() {
           <ol className="border-t border-hairline">
             {events.docs.map((event) => {
               const start = event.startDateTime ? new Date(event.startDateTime) : null
-              const status = STATUS_LABEL[event.rsvpStatus]
-              const isOpen = event.rsvpStatus === 'open'
+              const { label: status, open: isOpen } = eventPresentation(event)
 
               return (
                 <li key={event.id} className="border-b border-hairline">

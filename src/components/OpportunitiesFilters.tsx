@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useTransition } from 'react'
+import React, { useEffect, useRef, useTransition } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { trackEvent } from '@/components/Analytics'
 import { NetworkMap } from '@/components/NetworkMap'
@@ -17,17 +17,28 @@ export const OpportunitiesFilters: React.FC<Props> = ({ sectors, countries }) =>
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
+  const serializedSearchParams = searchParams.toString()
+  const paramsRef = useRef(serializedSearchParams)
+
+  // Keep rapid consecutive selections together. `useSearchParams` only updates
+  // after a route transition completes, so deriving a second filter from it
+  // alone can otherwise discard the first selection.
+  useEffect(() => {
+    paramsRef.current = serializedSearchParams
+  }, [serializedSearchParams])
 
   const updateParam = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(paramsRef.current)
+    params.delete('page')
     if (value) {
       params.set(key, value)
     } else {
       params.delete(key)
     }
+    paramsRef.current = params.toString()
     trackEvent('Opportunities Filter', { [key]: value || 'cleared' })
     startTransition(() => {
-      router.push(`${pathname}?${params.toString()}`)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
     })
   }
 

@@ -7,10 +7,13 @@ import { EmptyState } from '@/components/EmptyState'
 import { CardGrid, EntityCard } from '@/components/EntityCard'
 import { PageHeader, Section } from '@/components/Section'
 import { Button } from '@/components/ui/button'
+import { StoriesPending } from '@/components/StoriesPending'
+import { VERIFIED_MEMBER_STORIES_AVAILABLE } from '@/lib/content-policy'
 
 export const revalidate = 300
 
 export default async function CaseStudiesPage() {
+  if (!VERIFIED_MEMBER_STORIES_AVAILABLE) return <StoriesPending />
   const payload = await getPayload({ config: configPromise })
   const caseStudies = await payload.find({
     collection: 'case-studies',
@@ -67,6 +70,6 @@ export default async function CaseStudiesPage() {
 export function generateMetadata(): Metadata {
   return {
     title: 'Case Studies',
-    description: 'Real AGBN members, real referrals, real outcomes from across the network.',
+    description: 'Member stories from the AGBN network. Verified outcomes will be shared here when available.',
   }
 }

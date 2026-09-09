@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { MenuIcon, XIcon } from 'lucide-react'
 
 import type { Header as HeaderType, SiteSetting } from '@/payload-types'
@@ -15,30 +15,30 @@ interface HeaderClientProps {
   siteSettings?: SiteSetting
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data, siteSettings }) => {
+export const HeaderClient: React.FC<HeaderClientProps> = (props) => {
+  const pathname = usePathname()
+  return <HeaderNavigation key={pathname} {...props} />
+}
+
+const HeaderNavigation: React.FC<HeaderClientProps> = ({ data, siteSettings }) => {
   const [open, setOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
   const pathname = usePathname()
   const navItems = data?.navItems || []
   const ctaLabel = data?.ctaLabel || 'Join AGBN'
 
-  // Close the panel on navigation, and stop the page behind it from scrolling
-  // while it is open.
-  useEffect(() => {
-    setOpen(false)
-  }, [pathname])
-
+  // A nonmodal disclosure: focus can leave, which closes the panel. Route keys reset it.
   useEffect(() => {
     if (!open) return
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') {
+        setOpen(false)
+        menuButton.current?.focus()
+      }
     }
     window.addEventListener('keydown', onKeyDown)
 
     return () => {
-      document.body.style.overflow = previous
       window.removeEventListener('keydown', onKeyDown)
     }
   }, [open])
@@ -49,7 +49,9 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, siteSettings }
   }
 
   return (
-    <header className="sticky top-0 z-30 border-b border-hairline-dark bg-surface-brand">
+    <header onBlur={(event) => {
+      if (open && !event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false)
+    }} className="sticky top-0 z-30 border-b border-hairline-dark bg-surface-brand">
       {/* Keyboard users land here first and can jump straight past the nav. */}
       <a
         href="#main"
@@ -60,7 +62,11 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, siteSettings }
 
       {/* Capped at 72px so the bar never eats the viewport. */}
       <div className="container flex h-[68px] items-center justify-between gap-6">
-        <Link href="/" aria-label="AGBN home" className="shrink-0">
+        <Link
+          href="/"
+          aria-label="AGBN home"
+          className="shrink-0 transition-transform duration-200 ease-out-expo hover:scale-[1.035]"
+        >
           <Logo variant="gold" priority className="h-8 w-auto" />
         </Link>
 
@@ -87,12 +93,13 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, siteSettings }
 
         <Link
           href="/join"
-          className="hidden shrink-0 items-center rounded-md bg-gold px-5 py-2.5 text-body-s font-semibold text-navy transition-colors hover:bg-ember active:translate-y-px lg:inline-flex"
+          className="hidden shrink-0 items-center rounded-md bg-gold px-5 py-2.5 text-body-s font-semibold text-navy transition-[background-color,box-shadow,transform] duration-200 ease-out-expo hover:-translate-y-0.5 hover:bg-ember hover:shadow-lg active:translate-y-px lg:inline-flex"
         >
           {ctaLabel}
         </Link>
 
         <button
+          ref={menuButton}
           type="button"
           className="-mr-2 flex size-11 items-center justify-center text-white lg:hidden"
           aria-label={open ? 'Close menu' : 'Open menu'}
@@ -107,7 +114,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, siteSettings }
       {open && (
         <div
           id="mobile-nav"
-          className="border-t border-hairline-dark bg-surface-brand lg:hidden"
+          className="max-h-[calc(100dvh-69px)] overflow-y-auto overscroll-contain border-t border-hairline-dark bg-surface-brand lg:hidden"
         >
           <nav aria-label="Main" className="container flex flex-col py-3">
             {navItems.map((item, i) => {
@@ -118,7 +125,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, siteSettings }
                   link={item.link}
                   aria-current={current ? 'page' : undefined}
                   className={cn(
-                    'flex min-h-[48px] items-center border-b border-hairline-dark text-body-m transition-colors',
+                    'flex min-h-[48px] items-center border-b border-hairline-dark text-body-m transition-[color,transform] duration-200 ease-out-expo hover:translate-x-1',
                     current ? 'font-medium text-gold' : 'text-white',
                   )}
                 />
@@ -126,7 +133,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, siteSettings }
             })}
             <Link
               href="/join"
-              className="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-md bg-gold px-4 text-body-s font-semibold text-navy"
+              className="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-md bg-gold px-4 text-body-s font-semibold text-navy transition-[background-color,transform] duration-200 ease-out-expo hover:-translate-y-0.5 hover:bg-ember active:translate-y-px"
             >
               {ctaLabel}
             </Link>

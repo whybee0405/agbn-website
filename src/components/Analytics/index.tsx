@@ -1,21 +1,14 @@
 'use client'
 
 import Script from 'next/script'
-import React, { useEffect, useState } from 'react'
-import { CONSENT_EVENT, ConsentValue, getConsent } from '@/lib/consent'
+import React from 'react'
+import { useConsent } from '@/hooks/useConsent'
 
 const PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
 const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID
 
 export const Analytics: React.FC = () => {
-  const [consent, setConsentState] = useState<ConsentValue | null>(null)
-
-  useEffect(() => {
-    setConsentState(getConsent())
-    const onChange = (e: Event) => setConsentState((e as CustomEvent<ConsentValue>).detail)
-    window.addEventListener(CONSENT_EVENT, onChange)
-    return () => window.removeEventListener(CONSENT_EVENT, onChange)
-  }, [])
+  const consent = useConsent()
 
   return (
     <>

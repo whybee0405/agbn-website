@@ -10,6 +10,8 @@ import RichText from '@/components/RichText'
 import { RelatedItems, type RelatedItem } from '@/components/RelatedItems'
 import { Button } from '@/components/ui/button'
 import { generateMeta } from '@/utilities/generateMeta'
+import { StoriesPending } from '@/components/StoriesPending'
+import { VERIFIED_MEMBER_STORIES_AVAILABLE } from '@/lib/content-policy'
 
 export const revalidate = 300
 
@@ -42,6 +44,7 @@ export default async function CaseStudyPage({ params: paramsPromise }: Args) {
   const { slug } = await paramsPromise
   const caseStudy = await queryCaseStudyBySlug(slug)
   if (!caseStudy) return notFound()
+  if (!VERIFIED_MEMBER_STORIES_AVAILABLE) return <StoriesPending />
 
   const sectorName = typeof caseStudy.sector === 'object' ? caseStudy.sector?.name : undefined
   const sectorId = typeof caseStudy.sector === 'object' ? caseStudy.sector?.id : caseStudy.sector
@@ -129,6 +132,7 @@ export default async function CaseStudyPage({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
+  if (!VERIFIED_MEMBER_STORIES_AVAILABLE) return { title: 'Member stories', description: 'Verified member stories will be shared here when available.', robots: { index: false, follow: true }, openGraph: { title: 'AGBN member stories', description: 'Verified stories will be shared when available.' } }
   const { slug } = await paramsPromise
   const caseStudy = await queryCaseStudyBySlug(slug)
   return generateMeta({ doc: caseStudy })

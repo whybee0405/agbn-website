@@ -40,7 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         position: fixed and was previously covering the last row of content and
         the footer links on every page.
       */}
-      <body className="pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <body>
         <Providers>
           <AdminBar
             adminBarProps={{

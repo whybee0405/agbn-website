@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { cn } from '@/utilities/ui'
 
 type Props = {
@@ -24,11 +24,11 @@ type Props = {
  */
 export const Reveal: React.FC<Props> = ({ children, delay = 0, className, as: Tag = 'div' }) => {
   const ref = useRef<HTMLElement | null>(null)
-  const [state, setState] = useState<'idle' | 'pending' | 'shown'>('idle')
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    const setState = (state: 'pending' | 'shown') => { el.dataset.reveal = state }
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setState('shown')
@@ -76,7 +76,6 @@ export const Reveal: React.FC<Props> = ({ children, delay = 0, className, as: Ta
   return (
     <Tag
       ref={ref as React.Ref<never>}
-      data-reveal={state === 'idle' ? undefined : state}
       style={delay ? ({ '--reveal-delay': `${delay}ms` } as React.CSSProperties) : undefined}
       className={className && cn(className)}
     >

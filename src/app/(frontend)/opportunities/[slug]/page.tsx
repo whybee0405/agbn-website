@@ -10,6 +10,7 @@ import RichText from '@/components/RichText'
 import { RelatedItems, type RelatedItem } from '@/components/RelatedItems'
 import { Button } from '@/components/ui/button'
 import { generateMeta } from '@/utilities/generateMeta'
+import { PUBLISHED_OPPORTUNITIES_AVAILABLE } from '@/lib/content-policy'
 
 export const revalidate = 60
 
@@ -30,6 +31,7 @@ const queryOpportunityBySlug = cache(async (slug: string) => {
 })
 
 export async function generateStaticParams() {
+  if (!PUBLISHED_OPPORTUNITIES_AVAILABLE) return []
   const payload = await getPayload({ config: configPromise })
   const opportunities = await payload.find({
     collection: 'opportunities',
@@ -41,6 +43,7 @@ export async function generateStaticParams() {
 }
 
 export default async function OpportunityPage({ params: paramsPromise }: Args) {
+  if (!PUBLISHED_OPPORTUNITIES_AVAILABLE) return notFound()
   const { slug } = await paramsPromise
   const opportunity = await queryOpportunityBySlug(slug)
 
@@ -58,7 +61,7 @@ export default async function OpportunityPage({ params: paramsPromise }: Args) {
           depth: 1,
           limit: 3,
           overrideAccess: false,
-          where: { sector: { equals: sectorId }, id: { not_equals: opportunity.id } },
+          where: { sector: { equals: sectorId }, id: { not_equals: opportunity.id }, listingStatus: { not_equals: 'closed' } },
           sort: '-datePosted',
         })
       : { docs: [] }
@@ -75,7 +78,7 @@ export default async function OpportunityPage({ params: paramsPromise }: Args) {
       depth: 1,
       limit: 3 - sameSector.docs.length,
       overrideAccess: false,
-      where: { id: { not_in: excludeIds } },
+      where: { id: { not_in: excludeIds }, listingStatus: { not_equals: 'closed' } },
       sort: '-datePosted',
     })
     return { docs: [...sameSector.docs, ...backfill.docs], allSameSector: backfill.docs.length === 0 }
@@ -127,16 +130,19 @@ export default async function OpportunityPage({ params: paramsPromise }: Args) {
         </div>
 
         <aside className="h-fit rounded-lg border border-hairline bg-surface-raised p-6 lg:sticky lg:top-24">
-          <h2 className="text-display-s text-on-surface-heading">Interested?</h2>
+          <p className="mb-3 text-caption font-medium uppercase tracking-[0.12em] text-on-surface-accent">{opportunity.listingStatus === 'closed' ? 'Listing closed' : 'Referral opportunity'}</p>
+          {typeof opportunity.commissionRate === 'number' && <div className="mb-6 border-b border-hairline pb-6"><p className="font-display text-display-l font-medium text-on-surface-heading">{opportunity.commissionRate}%</p><p className="mt-1 text-body-s text-on-surface-muted">Listed referral commission</p></div>}
+          <h2 className="text-display-s text-on-surface-heading">{opportunity.listingStatus === 'closed' ? 'Find your next connection.' : 'Know the right person?'}</h2>
           <p className="mt-2 text-body-s text-on-surface-muted">
-            Referring this opportunity is an AGBN membership benefit.
+            {opportunity.listingStatus === 'closed' ? 'This listing is no longer taking referrals. Explore other opportunities on the board.' : 'Confirm availability, eligibility and commission terms with the team before making an introduction.'}
           </p>
           <Button asChild variant="gold" className="mt-5 w-full">
-            <Link href="/join">Join AGBN</Link>
+            <Link href={opportunity.listingStatus === 'closed' ? '/opportunities' : `/join?opportunity=${encodeURIComponent(slug)}`}>{opportunity.listingStatus === 'closed' ? 'Browse open listings' : 'Apply to make a referral'}</Link>
           </Button>
           <Button asChild variant="outline" className="mt-2.5 w-full">
-            <Link href="/contact">Ask a question</Link>
+            <Link href={`/contact?opportunity=${encodeURIComponent(slug)}`}>Ask about this opportunity</Link>
           </Button>
+          <p className="mt-5 text-caption text-on-surface-muted">Already a member? Use the enquiry link and the team can help you with the next step.</p>
         </aside>
       </div>
 
@@ -149,6 +155,7 @@ export default async function OpportunityPage({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
+  if (!PUBLISHED_OPPORTUNITIES_AVAILABLE) return { robots: { index: false, follow: false } }
   const { slug } = await paramsPromise
   const opportunity = await queryOpportunityBySlug(slug)
   return generateMeta({ doc: opportunity })

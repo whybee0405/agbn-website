@@ -30,13 +30,11 @@ const Meta: React.FC<{ items: Props['meta']; className?: string }> = ({ items, c
   if (parts.length === 0) return null
 
   return (
-    <dl className={cn('flex flex-wrap items-baseline gap-x-5 gap-y-1', className)}>
+    <ul className={cn('flex flex-wrap items-baseline gap-x-5 gap-y-1', className)}>
       {parts.map((part, i) => (
-        <div key={`${part}-${i}`}>
-          <dd className="font-mono text-caption uppercase tracking-[0.14em] text-on-surface-accent">{part}</dd>
-        </div>
+        <li key={`${part}-${i}`} className="font-mono text-caption uppercase tracking-[0.14em] text-on-surface-accent">{part}</li>
       ))}
-    </dl>
+    </ul>
   )
 }
 
@@ -69,7 +67,7 @@ export const EntityCard: React.FC<Props> = ({
     <Link
       href={href}
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-lg border border-hairline bg-surface-raised',
+        'group relative flex min-w-0 flex-col overflow-hidden rounded-lg border border-hairline bg-surface-raised',
         'transition-[border-color,box-shadow,transform] duration-200 ease-out',
         'hover:-translate-y-0.5 hover:border-gold hover:shadow-[0_12px_32px_-12px_rgb(10_29_55/0.28)]',
         feature && 'sm:col-span-2 lg:col-span-3 lg:flex-row',
@@ -87,6 +85,7 @@ export const EntityCard: React.FC<Props> = ({
             resource={image}
             alt={imageAlt}
             fill
+            className="relative block size-full"
             priority={priority}
             imgClassName="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
             size={

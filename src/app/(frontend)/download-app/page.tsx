@@ -51,7 +51,7 @@ export default function DownloadAppPage() {
     <>
       <PageHeader
         title="The AGBN app."
-        lede="A native mobile app for members: the opportunity feed, your referrals, and the member directory, on the device you actually carry."
+        lede="A preview of what’s being developed for AGBN members: opportunities, referrals and business connections in one place."
         meta={
           <span className="font-mono text-caption uppercase tracking-[0.14em] text-gold">
             In development
@@ -70,12 +70,10 @@ export default function DownloadAppPage() {
             It isn&rsquo;t available to download yet.
           </h2>
           <p className="mt-5 text-body-l text-on-surface-muted">
-            We are building it now, and there is no release date we would be willing to put in
-            writing yet. There is no waiting list to join and nothing to install.
+            The app is in development. A release date has not been announced, and the screens below are a design preview.
           </p>
           <p className="mt-4 text-body-l text-on-surface-muted">
-            Everything the app will do, the website already does. If you are a member, or thinking
-            about becoming one, nothing is waiting on the app.
+            For now, use the website to explore opportunities, compare membership options and contact the team about a referral.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild variant="gold" size="lg">
@@ -93,9 +91,9 @@ export default function DownloadAppPage() {
 
       <Section tone="sunken" rhythm="lg">
         <SectionHeading
-          kicker="What it will do"
-          title="Built around the four words, not around a dashboard."
-          lede="Connect. Refer. Earn. Grow. The app is a faster way to do those four things, not a different product."
+          kicker="The concept"
+          title="Your connections. Closer at hand."
+          lede="These are the planned features. Availability and functionality may change as development progresses."
           size="l"
         />
 

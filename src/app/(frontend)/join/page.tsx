@@ -6,6 +6,7 @@ import { getPayload } from 'payload'
 import { JoinForm } from '@/components/Form/JoinForm'
 import { NetworkMap } from '@/components/NetworkMap'
 import { PageHeader, Section } from '@/components/Section'
+import { getOpportunityContext } from '@/utilities/getOpportunityContext'
 
 export const revalidate = 3600
 
@@ -16,7 +17,8 @@ const WHAT_HAPPENS_NEXT = [
   'Once you are confirmed, your directory listing and opportunity feed go live.',
 ]
 
-export default async function JoinPage() {
+export default async function JoinPage({ searchParams }: { searchParams: Promise<{ opportunity?: string }> }) {
+  const opportunity = await getOpportunityContext((await searchParams).opportunity)
   const payload = await getPayload({ config: configPromise })
   const plans = await payload.find({
     collection: 'pricing-plans',
@@ -29,7 +31,7 @@ export default async function JoinPage() {
     <>
       <PageHeader
         tone="deep"
-        title="Join AGBN"
+        title="Your next chapter starts here."
         lede="Turn your network into income. Tell us about your business and a member of the AGBN team will follow up to get you set up."
       />
 
@@ -39,7 +41,7 @@ export default async function JoinPage() {
             <Suspense
               fallback={<NetworkMap variant="loading" className="py-16" />}
             >
-              <JoinForm tiers={plans.docs.map((p) => ({ id: String(p.id), name: p.name }))} />
+              <JoinForm tiers={plans.docs.map((p) => ({ id: String(p.id), name: p.name }))} opportunity={opportunity} />
             </Suspense>
           </div>
 
@@ -50,7 +52,7 @@ export default async function JoinPage() {
             <ol className="mt-5 space-y-5">
               {WHAT_HAPPENS_NEXT.map((step, i) => (
                 <li key={step} className="flex gap-4">
-                  <span className="tabular shrink-0 text-body-s text-gold" aria-hidden="true">
+                  <span className="tabular shrink-0 text-body-s text-on-surface-accent" aria-hidden="true">
                     0{i + 1}
                   </span>
                   <span className="text-body-s text-on-surface-muted">{step}</span>

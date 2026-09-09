@@ -8,11 +8,12 @@ import * as React from 'react'
 
 const buttonVariants = cva(
   [
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-body-s font-medium",
+    "inline-flex min-w-0 items-center justify-center gap-2 whitespace-normal rounded-md text-center text-body-s font-medium",
     // Transform is in the transition list so the press state can push the
     // button down a pixel. Colour and shadow only — never layout properties.
-    'transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out',
-    'active:translate-y-px',
+    'transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out-expo',
+    'hover:-translate-y-0.5 active:translate-y-px',
+    'hover:[&>svg]:translate-x-0.5 [&>svg]:transition-transform [&>svg]:duration-200',
     'disabled:pointer-events-none disabled:opacity-50',
     "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
     'aria-invalid:focus-visible:ring-0',
@@ -42,9 +43,9 @@ const buttonVariants = cva(
       size: {
         clear: '',
         // 44px minimum on the two sizes used for real touch targets.
-        default: 'h-11 px-5 has-[>svg]:px-4',
+        default: 'min-h-11 px-5 py-2.5 has-[>svg]:px-4',
         sm: 'h-9 rounded-md px-3.5 has-[>svg]:px-3',
-        lg: 'h-12 rounded-md px-7 text-body-m has-[>svg]:px-6',
+        lg: 'min-h-12 rounded-md px-6 py-3 text-body-m has-[>svg]:px-5',
         icon: 'size-11',
       },
     },

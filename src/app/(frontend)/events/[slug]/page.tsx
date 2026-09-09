@@ -11,25 +11,19 @@ import RichText from '@/components/RichText'
 import { EventRsvpForm } from '@/components/Form/EventRsvpForm'
 import { RelatedItems, type RelatedItem } from '@/components/RelatedItems'
 import { generateMeta } from '@/utilities/generateMeta'
+import { eventPresentation, eventDate } from '@/utilities/eventPresentation'
+import { PUBLISHED_EVENTS_AVAILABLE } from '@/lib/content-policy'
 
 export const revalidate = 60
 
-const eventDateFormatter = new Intl.DateTimeFormat('en-GB', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-})
-
 const formatEventDate = (value?: string | null) =>
-  value ? eventDateFormatter.format(new Date(value)) : ''
+  value ? eventDate.format(new Date(value)) : ''
 
 const shortDateFormatter = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',
   month: 'short',
   year: 'numeric',
+  timeZone: 'UTC',
 })
 
 type Args = { params: Promise<{ slug: string }> }
@@ -47,6 +41,7 @@ const queryEventBySlug = cache(async (slug: string) => {
 })
 
 export async function generateStaticParams() {
+  if (!PUBLISHED_EVENTS_AVAILABLE) return []
   const payload = await getPayload({ config: configPromise })
   const events = await payload.find({
     collection: 'events',
@@ -58,9 +53,11 @@ export async function generateStaticParams() {
 }
 
 export default async function EventPage({ params: paramsPromise }: Args) {
+  if (!PUBLISHED_EVENTS_AVAILABLE) return notFound()
   const { slug } = await paramsPromise
   const event = await queryEventBySlug(slug)
   if (!event) return notFound()
+  const presentation = eventPresentation(event)
 
   const related = await (async () => {
     const payload = await getPayload({ config: configPromise })
@@ -86,7 +83,7 @@ export default async function EventPage({ params: paramsPromise }: Args) {
     image: doc.featuredImage,
     imageAlt: doc.title,
     meta: [doc.startDateTime ? shortDateFormatter.format(new Date(doc.startDateTime)) : null, doc.venue],
-    status: doc.rsvpStatus !== 'open' ? 'Registration closed' : null,
+    status: eventPresentation(doc).label,
   }))
 
   return (
@@ -126,17 +123,15 @@ export default async function EventPage({ params: paramsPromise }: Args) {
 
         <aside className="h-fit rounded-lg border border-hairline bg-surface-raised p-6 lg:sticky lg:top-24">
           <h2 className="text-display-s text-on-surface-heading">
-            {event.rsvpStatus === 'open' ? 'RSVP for this event' : 'Registration not open yet'}
+            {presentation.open ? 'RSVP for this event' : presentation.label}
           </h2>
-          {event.rsvpStatus !== 'open' && (
+          {!presentation.open && (
             <p className="mt-2 text-body-s text-on-surface-muted">
-              {event.rsvpStatus === 'full'
-                ? "This event is full. We'll email you if a spot opens up."
-                : "Registration for this event isn't open yet. We'll email you the moment it is."}
+              {presentation.past ? 'This event has passed. Browse the events page for the next opportunity to meet the network.' : presentation.status === 'full' ? 'Leave your details to hear from the team if a place becomes available.' : 'Registration is currently closed. Leave your details if you would like the team to contact you about availability.'}
             </p>
           )}
           <div className="mt-5">
-            <EventRsvpForm eventId={String(event.id)} rsvpStatus={event.rsvpStatus} />
+            {presentation.past ? <Link href="/events" className="inline-flex min-h-11 items-center underline underline-offset-4">Browse upcoming events</Link> : <EventRsvpForm eventId={String(event.id)} rsvpStatus={event.rsvpStatus} />}
           </div>
         </aside>
       </div>
@@ -147,6 +142,7 @@ export default async function EventPage({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
+  if (!PUBLISHED_EVENTS_AVAILABLE) return { robots: { index: false, follow: false } }
   const { slug } = await paramsPromise
   const event = await queryEventBySlug(slug)
   return generateMeta({ doc: event })

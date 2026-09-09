@@ -13,10 +13,11 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { trackEvent } from '@/components/Analytics'
+import { runFormAction } from '@/lib/form-action'
 
 type Tier = { id: string; name: string }
 
-export const JoinForm: React.FC<{ tiers: Tier[] }> = ({ tiers }) => {
+export const JoinForm: React.FC<{ tiers: Tier[]; opportunity?: { title: string; slug: string } }> = ({ tiers, opportunity }) => {
   const searchParams = useSearchParams()
   const [done, setDone] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
@@ -28,13 +29,13 @@ export const JoinForm: React.FC<{ tiers: Tier[] }> = ({ tiers }) => {
     formState: { errors, isSubmitting },
   } = useForm<JoinInput>({
     resolver: zodResolver(joinSchema),
-    defaultValues: { selectedTier: searchParams.get('tier') || '' },
+    defaultValues: { selectedTier: tiers.some(t => t.id === searchParams.get('tier')) ? searchParams.get('tier') || '' : '', opportunity: opportunity?.slug || '' },
   })
 
   if (done) {
     return (
       <FormSuccess
-        title="You're in the queue."
+        title="Application received."
         message="Thanks for applying. The AGBN team will reach out within two business days to confirm your tier and get you set up."
       />
     )
@@ -42,7 +43,7 @@ export const JoinForm: React.FC<{ tiers: Tier[] }> = ({ tiers }) => {
 
   const onSubmit = async (data: JoinInput) => {
     setFormError(null)
-    const result = await submitJoin(data)
+    const result = await runFormAction(() => submitJoin(data))
     if (!result.success) {
       setFormError(result.message)
       if (result.fieldErrors) {
@@ -68,6 +69,8 @@ export const JoinForm: React.FC<{ tiers: Tier[] }> = ({ tiers }) => {
       className="space-y-5"
       noValidate
     >
+      {opportunity && <div className="border-b border-hairline pb-5"><p className="text-caption font-medium uppercase tracking-[0.1em] text-on-surface-accent">Your opportunity</p><p className="mt-2 text-body-l font-medium">{opportunity.title}</p><p className="mt-2 text-body-s text-on-surface-muted">We’ll include this listing with your application.</p></div>}
+      <input type="hidden" {...register('opportunity')} />
       <FormField label="Full name" htmlFor="join-name" required error={errors.name?.message}>
         <Input
           id="join-name"
@@ -94,6 +97,7 @@ export const JoinForm: React.FC<{ tiers: Tier[] }> = ({ tiers }) => {
           type="tel"
           inputMode="tel"
           autoComplete="tel"
+          placeholder="Include your country code"
           aria-invalid={errors.phone ? true : undefined}
           aria-describedby={errors.phone ? 'join-phone-error' : undefined}
           {...register('phone')}

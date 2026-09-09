@@ -8,6 +8,8 @@ import { CardGrid, EntityCard } from '@/components/EntityCard'
 import { MagazineFilters } from '@/components/MagazineFilters'
 import { PageHeader, Section } from '@/components/Section'
 import { Button } from '@/components/ui/button'
+import { VERIFIED_MEMBER_STORIES_AVAILABLE } from '@/lib/content-policy'
+import { PUBLISHED_MAGAZINE_AVAILABLE } from '@/lib/content-policy'
 
 export const revalidate = 300
 
@@ -29,6 +31,7 @@ export default async function MagazinePage({ searchParams: searchParamsPromise }
   const sectors = await payload.find({ collection: 'sectors', limit: 100, overrideAccess: false })
 
   const and: Where[] = []
+  if (!VERIFIED_MEMBER_STORIES_AVAILABLE) and.push({ pillar: { not_equals: 'deal-stories' } })
   if (pillar) and.push({ pillar: { equals: pillar } })
   if (sector) and.push({ 'sector.slug': { equals: sector } })
 
@@ -47,15 +50,21 @@ export default async function MagazinePage({ searchParams: searchParamsPromise }
     <>
       <PageHeader
         title="Magazine"
-        lede="Deal stories, sector spotlights, country spotlights, and network notes from across the AGBN community."
+        lede={
+          PUBLISHED_MAGAZINE_AVAILABLE
+            ? 'Perspectives on the sectors, markets and relationships shaping business across Africa.'
+            : 'A forthcoming home for AGBN stories, market perspectives and network updates.'
+        }
       />
 
       <Section tone="sunken" rhythm="md" rhythmTop="sm">
-        <MagazineFilters
-          sectors={sectors.docs.map((s) => ({ label: s.name, value: s.slug || '' }))}
-        />
+        {PUBLISHED_MAGAZINE_AVAILABLE && (
+          <MagazineFilters
+            sectors={sectors.docs.map((s) => ({ label: s.name, value: s.slug || '' }))}
+          />
+        )}
 
-        {posts.docs.length > 0 ? (
+        {PUBLISHED_MAGAZINE_AVAILABLE && posts.docs.length > 0 ? (
           <CardGrid className="mt-8">
             {posts.docs.map((post, i) => {
               const sectorName = typeof post.sector === 'object' ? post.sector?.name : undefined
@@ -68,7 +77,7 @@ export default async function MagazinePage({ searchParams: searchParamsPromise }
                   image={post.heroImage}
                   imageAlt={post.title}
                   meta={[PILLAR_LABEL[post.pillar as string], sectorName]}
-                  feature={i === 0 && !filtered && posts.docs.length > 3}
+                  feature={i === 0 && !filtered && posts.docs.length > 1}
                   priority={i === 0}
                 />
               )
@@ -76,8 +85,8 @@ export default async function MagazinePage({ searchParams: searchParamsPromise }
           </CardGrid>
         ) : (
           <EmptyState
-            title="No articles match those filters."
-            body="We publish deal stories and sector spotlights regularly. Try a broader filter."
+            title="The AGBN magazine is in development."
+            body="Stories, markets, deals and success updates will be shared here when they are ready to publish."
             action={
               <Button asChild variant="outline">
                 <Link href="/magazine">Clear filters</Link>

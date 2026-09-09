@@ -72,7 +72,7 @@ export const ArticleHero: React.FC<Props> = ({
 
   return (
     <header className="relative isolate w-full bg-surface-deep">
-      <div className="relative aspect-[16/9] w-full sm:aspect-[16/7]">
+      <div className="absolute inset-0">
         <Media
           resource={image}
           alt={imageAlt}
@@ -88,8 +88,8 @@ export const ArticleHero: React.FC<Props> = ({
           className="absolute inset-0 bg-gradient-to-t from-midnight via-midnight/75 to-midnight/10"
         />
       </div>
-      <div className="absolute inset-x-0 bottom-0">
-        <div className="container pb-8 sm:pb-10">{inner}</div>
+      <div className="relative flex min-h-[22rem] items-end sm:min-h-[30rem] lg:min-h-[34rem]">
+        <div className="container py-10 sm:py-14">{inner}</div>
       </div>
     </header>
   )

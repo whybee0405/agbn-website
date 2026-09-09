@@ -11,8 +11,9 @@ import { FormSuccess } from './FormSuccess'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { runFormAction } from '@/lib/form-action'
 
-export const ContactForm: React.FC = () => {
+export const ContactForm: React.FC<{ opportunity?: { title: string; slug: string } }> = ({ opportunity }) => {
   const [done, setDone] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const {
@@ -20,7 +21,7 @@ export const ContactForm: React.FC = () => {
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<ContactInput>({ resolver: zodResolver(contactSchema) })
+  } = useForm<ContactInput>({ resolver: zodResolver(contactSchema), defaultValues: { opportunity: opportunity?.slug || '' } })
 
   if (done) {
     return (
@@ -33,7 +34,7 @@ export const ContactForm: React.FC = () => {
 
   const onSubmit = async (data: ContactInput) => {
     setFormError(null)
-    const result = await submitContact(data)
+    const result = await runFormAction(() => submitContact(data))
     if (!result.success) {
       setFormError(result.message)
       if (result.fieldErrors) {
@@ -48,6 +49,8 @@ export const ContactForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+      {opportunity && <div className="border-b border-hairline pb-5"><p className="text-caption text-on-surface-accent">ASKING ABOUT</p><p className="mt-2 text-body-l font-medium">{opportunity.title}</p></div>}
+      <input type="hidden" {...register('opportunity')} />
       <FormField label="Full name" htmlFor="name" required error={errors.name?.message}>
         <Input
           id="name"

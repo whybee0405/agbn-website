@@ -4,6 +4,7 @@ const requiredString = (label: string) =>
   z.string().trim().min(1, { message: `${label} is required.` })
 
 export const contactSchema = z.object({
+  opportunity: z.string().trim().max(200).optional(),
   name: requiredString('Your name'),
   email: z.string().trim().email({ message: 'Enter a valid email address.' }),
   phone: z.string().trim().optional(),
@@ -14,6 +15,7 @@ export const contactSchema = z.object({
 export type ContactInput = z.infer<typeof contactSchema>
 
 export const joinSchema = z.object({
+  opportunity: z.string().trim().max(200).optional(),
   name: requiredString('Your name'),
   email: z.string().trim().email({ message: 'Enter a valid email address.' }),
   phone: requiredString('Phone number'),

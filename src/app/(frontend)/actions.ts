@@ -36,13 +36,15 @@ export async function submitContact(input: unknown): Promise<ActionResult> {
   }
 
   const payload = await getPayload({ config: configPromise })
-  await payload.create({ collection: 'contact-submissions', data: parsed.data })
+  const { opportunity, ...details } = parsed.data
+  await payload.create({ collection: 'contact-submissions', data: { ...details, message: [opportunity ? `Opportunity: ${opportunity}` : '', details.message].filter(Boolean).join('\n\n') } })
 
   await sendNotificationEmail(
     `New contact form submission from ${parsed.data.name}`,
     `<p><strong>Name:</strong> ${parsed.data.name}</p>
      <p><strong>Email:</strong> ${parsed.data.email}</p>
      <p><strong>Phone:</strong> ${parsed.data.phone || 'Not provided'}</p>
+     <p><strong>Opportunity:</strong> ${parsed.data.opportunity || 'General enquiry'}</p>
      <p><strong>Message:</strong><br/>${parsed.data.message}</p>`,
   )
 
@@ -60,10 +62,12 @@ export async function submitJoin(input: unknown): Promise<ActionResult> {
   }
 
   const payload = await getPayload({ config: configPromise })
+  const { opportunity, ...details } = parsed.data
   await payload.create({
     collection: 'member-leads',
     data: {
-      ...parsed.data,
+      ...details,
+      message: [opportunity ? `Opportunity: ${opportunity}` : '', details.message].filter(Boolean).join('\n\n'),
       selectedTier: parsed.data.selectedTier ? Number(parsed.data.selectedTier) : undefined,
     },
   })
@@ -74,6 +78,7 @@ export async function submitJoin(input: unknown): Promise<ActionResult> {
      <p><strong>Email:</strong> ${parsed.data.email}</p>
      <p><strong>Phone:</strong> ${parsed.data.phone}</p>
      <p><strong>Country:</strong> ${parsed.data.country || 'Not provided'}</p>
+     <p><strong>Opportunity:</strong> ${parsed.data.opportunity || 'General application'}</p>
      <p><strong>Message:</strong><br/>${parsed.data.message || 'Not provided'}</p>`,
   )
 

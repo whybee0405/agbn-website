@@ -23,11 +23,15 @@ export default async function PricingPage() {
     <>
       <PageHeader
         tone="deep"
-        title="Membership tiers"
-        lede="Every tier connects you to the AGBN network. Higher tiers add priority introductions, visibility, and access."
+        title="Find your place in the network."
+        lede="Start with connections. Add visibility as your business grows. Choose the membership that fits your next move."
       />
 
       <Section tone="sunken" rhythm="md" rhythmTop="sm">
+        <div className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-hairline pb-6">
+          <p className="text-body-m font-medium text-on-surface-heading">Apply today. Confirm your membership with the team.</p>
+          <p className="text-body-s text-on-surface-muted">Prices in USD. No payment taken on this site.</p>
+        </div>
         {pricingPlans.docs.length === 0 ? (
           <EmptyState
             title="Pricing is being finalised."
@@ -39,7 +43,7 @@ export default async function PricingPage() {
             }
           />
         ) : (
-          <div className="grid items-start gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 items-stretch gap-5 md:grid-cols-3">
             {pricingPlans.docs.map((plan) => {
               const highlighted = Boolean(plan.highlighted)
               return (
@@ -47,13 +51,13 @@ export default async function PricingPage() {
                   key={plan.id}
                   className={
                     highlighted
-                      ? 'flex flex-col rounded-lg border border-gold bg-surface-brand p-8 text-on-dark md:-mt-6 md:pb-12 md:pt-12'
-                      : 'flex flex-col rounded-lg border border-hairline bg-surface-raised p-8'
+                      ? 'flex min-w-0 flex-col rounded-lg border border-gold bg-surface-brand p-5 text-on-dark sm:p-7'
+                      : 'flex min-w-0 flex-col rounded-lg border border-hairline bg-surface-raised p-5 sm:p-7'
                   }
                 >
                   {highlighted && (
                     <p className="mb-3 font-mono text-caption uppercase tracking-[0.14em] text-gold">
-                      Most popular
+                      More visibility
                     </p>
                   )}
                   <h2 className={highlighted ? 'text-display-m text-on-dark' : 'text-display-m text-on-surface-heading'}>
@@ -132,7 +136,7 @@ export default async function PricingPage() {
                     asChild
                     variant={highlighted ? 'gold' : 'outline'}
                     size="lg"
-                    className="mt-3 w-full"
+                    className="mt-3 w-full text-body-s"
                   >
                     <Link href={`/join?tier=${plan.id}`}>
                       Apply for {plan.name}
@@ -173,7 +177,7 @@ export default async function PricingPage() {
             {[
               {
                 q: 'Am I paying now?',
-                a: 'No. The form is an application, not a checkout. A member of the AGBN team follows up to confirm your tier and arrange payment. In-app payment arrives in a later phase.',
+                a: 'No payment is taken with the application. A member of the AGBN team follows up to confirm your tier and discuss payment before you commit.',
               },
               {
                 q: 'What happens after I apply?',

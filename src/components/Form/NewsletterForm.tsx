@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useId, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckCircle2 } from 'lucide-react'
@@ -9,8 +9,10 @@ import { subscribeNewsletter } from '@/app/(frontend)/actions'
 import { newsletterSchema, type NewsletterInput } from '@/lib/validation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { runFormAction } from '@/lib/form-action'
 
 export const NewsletterForm: React.FC = () => {
+  const emailId = useId()
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const {
@@ -30,7 +32,7 @@ export const NewsletterForm: React.FC = () => {
 
   const onSubmit = async (data: NewsletterInput) => {
     setError(null)
-    const result = await subscribeNewsletter(data)
+    const result = await runFormAction(() => subscribeNewsletter(data))
     if (!result.success) {
       setError(result.message)
       return
@@ -40,8 +42,10 @@ export const NewsletterForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-2">
-      <div className="flex gap-2">
+      <label htmlFor={emailId} className="text-body-s text-on-dark-muted">Email address</label>
+      <div className="flex flex-wrap gap-2">
         <Input
+          id={emailId}
           type="email"
           inputMode="email"
           autoComplete="email"
@@ -50,7 +54,7 @@ export const NewsletterForm: React.FC = () => {
           aria-invalid={errors.email ? true : undefined}
           /* This input sits on the midnight footer, so it opts out of the
              light-surface field styling rather than inheriting it. */
-          className="border-white/25 bg-white/5 text-white placeholder:text-on-dark-muted hover:border-white/45"
+          className="min-w-0 flex-1 basis-40 border-white/25 bg-white/5 text-white placeholder:text-on-dark-muted hover:border-white/45"
           {...register('email')}
         />
         <Button type="submit" variant="gold" loading={isSubmitting} className="shrink-0">

@@ -1,4 +1,6 @@
-import React from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 import { cn } from '@/utilities/ui'
 
@@ -24,7 +26,31 @@ type Props = {
   className?: string
 }
 
-export const WhatsAppButton: React.FC<Props> = ({ className }) => (
+export const WhatsAppButton: React.FC<Props> = ({ className }) => {
+  const pathname = usePathname()
+  const [homeActionState, setHomeActionState] = useState({ pathname: '', isVisible: false })
+  const isOverHomeAction = homeActionState.pathname === pathname && homeActionState.isVisible
+
+  useEffect(() => {
+    if (pathname !== '/') return
+
+    const protectedSections = ['how-it-works', 'home-app-preview']
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => section !== null)
+
+    if (!protectedSections.length) return
+
+    const observer = new IntersectionObserver(
+      (entries) => setHomeActionState({ pathname, isVisible: entries.some((entry) => entry.isIntersecting) }),
+      { threshold: 0.12 },
+    )
+
+    protectedSections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [pathname])
+
+  if (pathname === '/join' || pathname === '/contact' || pathname.startsWith('/events/')) return null
+  return (
   <a
     href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(PREFILLED_MESSAGE)}`}
     target="_blank"
@@ -47,10 +73,11 @@ export const WhatsAppButton: React.FC<Props> = ({ className }) => (
       // make it read as a generic button and cost the instant recognition that
       // is the entire reason it works.
       'bg-[#25D366] py-3 pl-3 pr-3 text-[#053C24] shadow-[0_8px_24px_-6px_rgb(6_20_38/0.45)]',
-      'transition-[transform,box-shadow] duration-200 ease-out',
+      'transition-[transform,box-shadow,opacity] duration-200 ease-out',
       'hover:shadow-[0_12px_30px_-6px_rgb(6_20_38/0.55)] active:scale-[0.97]',
       // 48px minimum touch target on the icon alone, before the label.
       'min-h-12 min-w-12',
+      isOverHomeAction && 'pointer-events-none scale-95 opacity-0',
       className,
     )}
   >
@@ -82,4 +109,5 @@ export const WhatsAppButton: React.FC<Props> = ({ className }) => (
       Chat on WhatsApp
     </span>
   </a>
-)
+  )
+}
