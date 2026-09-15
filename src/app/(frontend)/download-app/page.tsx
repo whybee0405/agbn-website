@@ -50,6 +50,9 @@ export default function DownloadAppPage() {
   return (
     <>
       <PageHeader
+        backgroundImage="/brand/agbn-app-screens.webp"
+        backgroundPosition="right center"
+        backgroundFit="contain"
         title="The AGBN app."
         lede="A preview of what’s being developed for AGBN members: opportunities, referrals and business connections in one place."
         meta={

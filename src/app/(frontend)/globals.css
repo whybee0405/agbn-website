@@ -10,6 +10,11 @@
 @custom-variant 2xl (@media (width >= theme(--breakpoint-2xl)));
 
 @layer base {
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   h1,
   h2,
   h3,
@@ -562,6 +567,32 @@ footer {
 html {
   scroll-padding-top: 6rem;
 }
+.page-header-image-led {
+  min-height: clamp(20rem, 34vw, 27rem);
+  display: flex;
+  align-items: flex-end;
+}
+.page-header-image {
+  opacity: 0.78;
+}
+.page-header-scrim {
+  background:
+    linear-gradient(90deg, rgb(6 20 38 / 0.98) 0%, rgb(6 20 38 / 0.92) 38%, rgb(6 20 38 / 0.46) 72%, rgb(6 20 38 / 0.28) 100%),
+    linear-gradient(0deg, rgb(6 20 38 / 0.74) 0%, transparent 58%);
+}
+@media (max-width: 47.999rem) {
+  .page-header-image-led {
+    min-height: 21rem;
+  }
+  .page-header-image {
+    opacity: 0.62;
+  }
+  .page-header-scrim {
+    background:
+      linear-gradient(90deg, rgb(6 20 38 / 0.97) 0%, rgb(6 20 38 / 0.8) 100%),
+      linear-gradient(0deg, rgb(6 20 38 / 0.88) 0%, transparent 72%);
+  }
+}
 /* Text links share a quiet directional response. Buttons, cards and the
    primary navigation own their more specific treatments below. */
 main a[href]:not([data-slot='button']):not(.group) {
@@ -670,6 +701,37 @@ main a[href]:not([data-slot='button']):not(.group)::after {
 .opportunity-preview:hover h3 {
   color: var(--on-surface-accent);
 }
+.gallery-ticker-track {
+  animation: gallery-ticker 48s linear infinite;
+  will-change: transform;
+}
+.gallery-ticker {
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+.gallery-ticker::-webkit-scrollbar {
+  height: 6px;
+}
+.gallery-ticker::-webkit-scrollbar-thumb {
+  background: rgb(10 29 55 / 0.35);
+  border-radius: 999px;
+}
+@media (max-width: 39.999rem) {
+  .gallery-ticker {
+    scrollbar-width: none;
+  }
+  .gallery-ticker::-webkit-scrollbar {
+    display: none;
+  }
+}
+.gallery-ticker:hover .gallery-ticker-track,
+.gallery-ticker:focus-within .gallery-ticker-track {
+  animation-play-state: paused;
+}
+@keyframes gallery-ticker {
+  to { transform: translateX(-50%); }
+}
 @media (max-width: 63.999rem) {
   .home-hero-art {
     inset: 12% -35% 0 10%;
@@ -732,5 +794,15 @@ main a[href]:not([data-slot='button']):not(.group)::after {
   [data-reveal='pending'] {
     opacity: 1;
     transform: none;
+  }
+
+  .gallery-ticker {
+    overflow-x: auto;
+  }
+  .gallery-ticker-track {
+    animation: none;
+  }
+  .gallery-ticker-track > :nth-child(n + 13) {
+    display: none;
   }
 }

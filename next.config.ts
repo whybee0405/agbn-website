@@ -12,6 +12,9 @@ const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   : process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'
 
 const nextConfig: NextConfig = {
+  // The production container runs the standalone Next.js output generated at
+  // build time. This keeps the runtime image small and self-contained.
+  output: 'standalone',
   images: {
     formats: ['image/avif', 'image/webp'],
     // Defining localPatterns at all turns this into a strict allowlist: any

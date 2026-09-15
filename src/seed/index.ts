@@ -3,6 +3,7 @@ import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { config as loadEnv } from 'dotenv'
 import { getPayload } from 'payload'
+import type { SadcCountry } from '@/constants/countries'
 
 import { richTextFromParagraphs } from './richText'
 import { slugify } from '../fields/slug'
@@ -113,68 +114,57 @@ async function main() {
     sectorIdByName[sector.name] = doc.id
   }
 
-  // ---- Pricing plans (real tiers/prices from the live site) -----------
+  // ---- Pricing plans (all fees are quoted in South African rand) -------
   const PLANS = [
     {
-      name: 'Africa Connect',
-      price: 10,
-      currency: 'USD' as const,
+      name: 'CONNECT',
+      price: 350,
+      currency: 'ZAR' as const,
       billingPeriod: 'month' as const,
-      localPriceEstimate: '± R180 /month',
-      tagline: 'For starting & growing businesses',
-      ctaText: 'Build connections. Open doors.',
+      tagline: 'Build Your Network',
+      ctaText: 'Perfect for starting out',
       order: 1,
       highlighted: false,
       features: [
+        'Free entry to events',
         'Directory listing',
-        'Africa Opportunity Feed access',
-        'Digital events & webinars',
-        'Member WhatsApp community',
-        'Referral opportunities',
-        'Monthly networking webinar',
-        'Business resources & insights',
+        'Event photos',
+        'Promote your products & services',
+        'Exhibition booth - R1000/event',
       ],
     },
     {
-      name: 'Africa Grow',
-      price: 25,
-      currency: 'USD' as const,
+      name: 'GROW',
+      price: 750,
+      currency: 'ZAR' as const,
       billingPeriod: 'month' as const,
-      localPriceEstimate: '± R450 /month',
-      tagline: 'For businesses ready to expand',
-      ctaText: 'Get noticed. Get opportunities.',
+      tagline: 'Create Opportunities',
+      ctaText: 'Ideal for growing businesses',
       order: 2,
       highlighted: true,
       features: [
-        'Everything in Connect',
-        'Featured directory placement',
-        'Quarterly business spotlight',
-        'Opportunity matching',
-        'Priority referrals & introductions',
-        'Country Ambassadors access',
-        'Exclusive roundtable discussions',
-        'Discounts on AGBN programs',
+        'All Connect benefits',
+        '2 Guest passes monthly',
+        'Priority visibility',
+        '2 Member spotlight videos/year',
+        'FREE exhibition booth - 1/quarter',
       ],
     },
     {
-      name: 'Africa Elite',
-      price: 75,
-      currency: 'USD' as const,
+      name: 'GROW PRO MAX',
+      price: 2000,
+      currency: 'ZAR' as const,
       billingPeriod: 'month' as const,
-      localPriceEstimate: '± R1,350 /month',
-      tagline: 'For leaders & game changers',
-      ctaText: 'Be seen. Be trusted. Be preferred.',
+      tagline: 'Scale Your Impact',
+      ctaText: 'For business leaders & visionaries',
       order: 3,
       highlighted: false,
       features: [
-        'Everything in Grow',
-        'Priority corporate introductions',
-        'Funding readiness assessment',
-        'ABA Investments visibility',
-        'Speaker opportunities',
-        'Podcast features',
-        'Magazine features',
-        'Strategic Partners / capital access',
+        'All Grow benefits',
+        'Priority event access',
+        'Exclusive executive experiences',
+        'Strategic partnership opportunities',
+        'VIP member status',
       ],
     },
   ]
@@ -210,7 +200,7 @@ async function main() {
     {
       title: 'Solar Mini-Grid Rollout, Rural Electrification',
       sector: 'Green Energy',
-      country: 'Kenya',
+      country: 'Zimbabwe',
       status: 'open' as const,
       summary: 'A green energy developer needs local installation and maintenance partners for a rural solar mini-grid rollout.',
       image: 6,
@@ -224,7 +214,7 @@ async function main() {
     {
       title: 'Cold-Chain Logistics Partner Needed',
       sector: 'Logistics',
-      country: 'Nigeria',
+      country: 'Mozambique',
       status: 'open' as const,
       summary: 'A perishable-goods exporter is looking for a reliable cold-chain logistics partner in Lagos.',
       image: 7,
@@ -238,7 +228,7 @@ async function main() {
     {
       title: 'Agritech Distribution Across East Africa',
       sector: 'Agriculture',
-      country: 'Zambia',
+      country: 'Lesotho',
       status: 'open' as const,
       summary: 'An agritech company is expanding distribution of soil-sensor hardware across East Africa.',
       image: 5,
@@ -252,7 +242,7 @@ async function main() {
     {
       title: 'Fintech Integration Partner, Mobile Payments',
       sector: 'Finance & Investment',
-      country: 'Ghana',
+      country: 'Botswana',
       status: 'closed' as const,
       summary: 'A mobile payments fintech has closed its search for an integration partner in Ghana.',
       image: 8,
@@ -265,7 +255,7 @@ async function main() {
     {
       title: 'Healthcare Equipment Supply Contract',
       sector: 'Healthcare',
-      country: 'Rwanda',
+      country: 'Namibia',
       status: 'open' as const,
       summary: 'A regional clinic network is sourcing a reliable supplier of diagnostic equipment.',
       image: 2,
@@ -289,7 +279,7 @@ async function main() {
       data: {
         title: opp.title,
         sector: sectorIdByName[opp.sector],
-        country: opp.country,
+        country: opp.country as SadcCountry,
         listingStatus: opp.status,
         commissionRate: opp.commissionRate,
         datePosted: new Date().toISOString(),
@@ -398,7 +388,7 @@ async function main() {
     {
       memberName: 'Amara Okafor',
       memberBusiness: 'Okafor AgroExports',
-      country: 'Nigeria',
+      country: 'Mozambique',
       sector: 'Agriculture',
       outcomeMetric: 'Referral closed: $15,000 contract',
       image: 13,
@@ -412,7 +402,7 @@ async function main() {
     {
       memberName: 'Grace Mwangi',
       memberBusiness: 'Mwangi Solar Solutions',
-      country: 'Kenya',
+      country: 'Zimbabwe',
       sector: 'Green Energy',
       outcomeMetric: 'Referral closed: $22,000 contract',
       image: 6,
@@ -436,7 +426,7 @@ async function main() {
       data: {
         memberName: cs.memberName,
         memberBusiness: cs.memberBusiness,
-        country: cs.country,
+        country: cs.country as SadcCountry,
         sector: sectorIdByName[cs.sector],
         featuredImage: mediaByIndex[cs.image],
         summary: cs.summary,
@@ -483,7 +473,7 @@ async function main() {
       title: 'Doing Business in Ghana: What AGBN Members Need to Know',
       pillar: 'country-spotlights' as const,
       sector: undefined,
-      country: 'Ghana',
+        country: 'Botswana',
       excerpt: 'A country spotlight on doing business in Ghana, for members expanding beyond their home market.',
       image: 5,
       body: [
@@ -525,7 +515,7 @@ async function main() {
         excerpt: post.excerpt,
         pillar: post.pillar,
         sector: post.sector ? sectorIdByName[post.sector] : undefined,
-        country: post.country,
+        country: post.country as SadcCountry | undefined,
         content: richTextFromParagraphs(post.body),
         authors: authorId ? [authorId] : undefined,
         publishedAt: new Date().toISOString(),
@@ -583,6 +573,7 @@ async function main() {
       },
       contactEmail: 'hello@agbn.example',
       contactPhone: '+27 81 707 5226',
+      whatsappGroupUrl: 'https://chat.whatsapp.com/BRnfMQiLnuI04bsvTolanM?s=cl&p=i&mlu=4&ilr=4',
       socialLinks: [
         { platform: 'instagram', url: 'https://instagram.com/africa_global_business_network' },
       ],
@@ -600,7 +591,6 @@ async function main() {
         { link: { type: 'internal', route: '/about', label: 'About' } },
         { link: { type: 'internal', route: '/pricing', label: 'Pricing' } },
         { link: { type: 'internal', route: '/events', label: 'Events' } },
-        { link: { type: 'internal', route: '/magazine', label: 'Magazine' } },
         { link: { type: 'internal', route: '/download-app', label: 'App' } },
       ],
     },
@@ -624,7 +614,6 @@ async function main() {
         {
           groupTitle: 'Resources',
           links: [
-            { link: { type: 'internal', route: '/magazine', label: 'Magazine' } },
             { link: { type: 'internal', route: '/case-studies', label: 'Case Studies' } },
             { link: { type: 'internal', route: '/pricing', label: 'Pricing' } },
             { link: { type: 'internal', route: '/contact', label: 'Contact' } },

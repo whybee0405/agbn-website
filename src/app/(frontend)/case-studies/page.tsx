@@ -8,9 +8,11 @@ import { CardGrid, EntityCard } from '@/components/EntityCard'
 import { PageHeader, Section } from '@/components/Section'
 import { Button } from '@/components/ui/button'
 import { StoriesPending } from '@/components/StoriesPending'
+import { DemoContentNotice } from '@/components/DemoContentNotice'
 import { VERIFIED_MEMBER_STORIES_AVAILABLE } from '@/lib/content-policy'
 
 export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 export default async function CaseStudiesPage() {
   if (!VERIFIED_MEMBER_STORIES_AVAILABLE) return <StoriesPending />
@@ -27,10 +29,11 @@ export default async function CaseStudiesPage() {
       <PageHeader
         tone="deep"
         title="Case Studies"
-        lede="Real AGBN members, real referrals, real outcomes from across the network."
+        lede="Illustrative member-story examples showing the kind of network outcomes AGBN aims to enable."
       />
 
       <Section tone="page" rhythm="md" rhythmTop="sm">
+        <DemoContentNotice className="mb-7" />
         {caseStudies.docs.length > 0 ? (
           <CardGrid>
             {caseStudies.docs.map((cs, i) => {
@@ -57,7 +60,7 @@ export default async function CaseStudiesPage() {
             body="We publish deal stories with real numbers, with the member's permission. The first ones land soon."
             action={
               <Button asChild variant="outline">
-                <Link href="/magazine">Read the magazine</Link>
+                <Link href="/opportunities">Browse opportunities</Link>
               </Button>
             }
           />

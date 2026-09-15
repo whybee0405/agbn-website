@@ -80,6 +80,7 @@ export interface Config {
     'member-leads': MemberLead;
     'contact-submissions': ContactSubmission;
     'newsletter-subscribers': NewsletterSubscriber;
+    gallery: Gallery;
     users: User;
     redirects: Redirect;
     forms: Form;
@@ -105,6 +106,7 @@ export interface Config {
     'member-leads': MemberLeadsSelect<false> | MemberLeadsSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
     'newsletter-subscribers': NewsletterSubscribersSelect<false> | NewsletterSubscribersSelect<true>;
+    gallery: GallerySelect<false> | GallerySelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -305,7 +307,7 @@ export interface Post {
   excerpt: string;
   pillar: 'deal-stories' | 'sector-spotlights' | 'country-spotlights' | 'network-notes';
   sector?: (number | null) | Sector;
-  country?: string | null;
+  country?: ('South Africa' | 'Zimbabwe' | 'Mozambique' | 'Lesotho' | 'Botswana' | 'Namibia') | null;
   content: {
     root: {
       type: string;
@@ -415,7 +417,7 @@ export interface Opportunity {
   title: string;
   slug?: string | null;
   sector: number | Sector;
-  country: string;
+  country: 'South Africa' | 'Zimbabwe' | 'Mozambique' | 'Lesotho' | 'Botswana' | 'Namibia';
   listingStatus: 'open' | 'closed';
   /**
    * Referral commission as a percentage, e.g. 5. Leave empty to hide.
@@ -462,10 +464,10 @@ export interface PricingPlan {
   id: number;
   name: string;
   price: number;
-  currency: 'USD' | 'ZAR';
+  currency: 'ZAR';
   billingPeriod: 'month' | 'year';
   /**
-   * e.g. "± R450 /month". Shown alongside the USD figure.
+   * Optional supporting note shown below the price. Leave blank when the price above is the final ZAR fee.
    */
   localPriceEstimate?: string | null;
   tagline: string;
@@ -544,10 +546,14 @@ export interface CaseStudy {
   memberName: string;
   slug?: string | null;
   memberBusiness: string;
-  country: string;
+  country: 'South Africa' | 'Zimbabwe' | 'Mozambique' | 'Lesotho' | 'Botswana' | 'Namibia';
   sector: number | Sector;
   featuredImage: number | Media;
   summary: string;
+  /**
+   * Optional. Paste a YouTube or youtu.be link to embed the video on this case study.
+   */
+  youtubeUrl?: string | null;
   body: {
     root: {
       type: string;
@@ -588,7 +594,7 @@ export interface MemberLead {
   name: string;
   email: string;
   phone: string;
-  country?: string | null;
+  country?: ('South Africa' | 'Zimbabwe' | 'Mozambique' | 'Lesotho' | 'Botswana' | 'Namibia') | null;
   selectedTier?: (number | null) | PricingPlan;
   message?: string | null;
   status?: ('new' | 'contacted' | 'converted') | null;
@@ -622,6 +628,37 @@ export interface NewsletterSubscriber {
   subscribedAt?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery".
+ */
+export interface Gallery {
+  id: number;
+  /**
+   * The shared label shown above a set of related gallery items, for example “AGBN Durban networking breakfast”.
+   */
+  group: string;
+  /**
+   * A private descriptive label for screen readers and the enlarged viewer. It is not displayed on gallery tiles.
+   */
+  title: string;
+  mediaType: 'image' | 'video';
+  /**
+   * Lower numbers appear first. Items with the same number keep their most recently updated order.
+   */
+  order?: number | null;
+  /**
+   * Upload the image or video file for this gallery item.
+   */
+  media: number | Media;
+  /**
+   * Recommended for video items. This still image appears in the gallery before the video is opened.
+   */
+  poster?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1000,6 +1037,10 @@ export interface PayloadLockedDocument {
         value: number | NewsletterSubscriber;
       } | null)
     | ({
+        relationTo: 'gallery';
+        value: number | Gallery;
+      } | null)
+    | ({
         relationTo: 'users';
         value: number | User;
       } | null)
@@ -1335,6 +1376,7 @@ export interface CaseStudiesSelect<T extends boolean = true> {
   sector?: T;
   featuredImage?: T;
   summary?: T;
+  youtubeUrl?: T;
   body?: T;
   outcomeMetric?: T;
   meta?:
@@ -1388,6 +1430,21 @@ export interface NewsletterSubscribersSelect<T extends boolean = true> {
   subscribedAt?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery_select".
+ */
+export interface GallerySelect<T extends boolean = true> {
+  group?: T;
+  title?: T;
+  mediaType?: T;
+  order?: T;
+  media?: T;
+  poster?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1666,7 +1723,7 @@ export interface Header {
                 | '/about'
                 | '/pricing'
                 | '/events'
-                | '/magazine'
+                | '/gallery'
                 | '/case-studies'
                 | '/contact'
                 | '/join'
@@ -1706,7 +1763,7 @@ export interface Footer {
                       | '/about'
                       | '/pricing'
                       | '/events'
-                      | '/magazine'
+                      | '/gallery'
                       | '/case-studies'
                       | '/contact'
                       | '/join'

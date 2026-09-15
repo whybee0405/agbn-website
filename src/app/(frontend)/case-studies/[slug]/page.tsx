@@ -12,10 +12,26 @@ import { Button } from '@/components/ui/button'
 import { generateMeta } from '@/utilities/generateMeta'
 import { StoriesPending } from '@/components/StoriesPending'
 import { VERIFIED_MEMBER_STORIES_AVAILABLE } from '@/lib/content-policy'
+import { DemoContentNotice } from '@/components/DemoContentNotice'
 
 export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 type Args = { params: Promise<{ slug: string }> }
+
+const youtubeEmbedUrl = (url?: string | null) => {
+  if (!url) return null
+  try {
+    const parsed = new URL(url)
+    const hostname = parsed.hostname.replace(/^www\./, '')
+    const id = hostname === 'youtu.be'
+      ? parsed.pathname.slice(1).split('/')[0]
+      : parsed.searchParams.get('v') || (['embed', 'shorts'].includes(parsed.pathname.split('/')[1]) ? parsed.pathname.split('/')[2] : null)
+    return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? `https://www.youtube-nocookie.com/embed/${id}` : null
+  } catch {
+    return null
+  }
+}
 
 const queryCaseStudyBySlug = cache(async (slug: string) => {
   const payload = await getPayload({ config: configPromise })
@@ -29,17 +45,6 @@ const queryCaseStudyBySlug = cache(async (slug: string) => {
   return result.docs?.[0] || null
 })
 
-export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const docs = await payload.find({
-    collection: 'case-studies',
-    limit: 1000,
-    pagination: false,
-    select: { slug: true },
-  })
-  return docs.docs.map(({ slug }) => ({ slug }))
-}
-
 export default async function CaseStudyPage({ params: paramsPromise }: Args) {
   const { slug } = await paramsPromise
   const caseStudy = await queryCaseStudyBySlug(slug)
@@ -48,6 +53,7 @@ export default async function CaseStudyPage({ params: paramsPromise }: Args) {
 
   const sectorName = typeof caseStudy.sector === 'object' ? caseStudy.sector?.name : undefined
   const sectorId = typeof caseStudy.sector === 'object' ? caseStudy.sector?.id : caseStudy.sector
+  const youtubeEmbed = youtubeEmbedUrl(caseStudy.youtubeUrl)
 
   const { docs: related, allSameSector } = await (async () => {
     const payload = await getPayload({ config: configPromise })
@@ -103,12 +109,27 @@ export default async function CaseStudyPage({ params: paramsPromise }: Args) {
 
       <div className="container mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
         <div>
+          <DemoContentNotice className="mb-8" />
           {caseStudy.outcomeMetric && (
             /* The outcome is the whole point of a case study, so it leads at
                display scale instead of sitting in a small tinted pill. */
             <p className="mb-10 border-l-0 border-t border-savanna pt-5 tabular text-display-m text-savanna">
               {caseStudy.outcomeMetric}
             </p>
+          )}
+          {youtubeEmbed && (
+            <section className="mb-10" aria-labelledby="case-study-video-title">
+              <h2 id="case-study-video-title" className="mb-4 text-display-s text-on-surface-heading">Watch the story</h2>
+              <div className="aspect-video overflow-hidden rounded-lg bg-surface-deep">
+                <iframe
+                  className="size-full"
+                  src={youtubeEmbed}
+                  title={`Video: ${caseStudy.memberName}, ${caseStudy.memberBusiness}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </section>
           )}
           {caseStudy.body && <RichText data={caseStudy.body} enableGutter={false} />}
         </div>

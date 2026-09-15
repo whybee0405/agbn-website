@@ -79,6 +79,7 @@ export const SiteSettings: GlobalConfig = {
     {
       name: 'whatsappGroupUrl',
       type: 'text',
+      defaultValue: 'https://chat.whatsapp.com/BRnfMQiLnuI04bsvTolanM?s=cl&p=i&mlu=4&ilr=4',
       admin: { description: 'Link to the existing WhatsApp community group.' },
     },
     {

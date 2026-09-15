@@ -8,10 +8,12 @@ import { EmptyState } from '@/components/EmptyState'
 import { Media } from '@/components/Media'
 import { PageHeader, Section } from '@/components/Section'
 import { Button } from '@/components/ui/button'
+import { DemoContentNotice } from '@/components/DemoContentNotice'
 import { eventPresentation } from '@/utilities/eventPresentation'
 import { PUBLISHED_EVENTS_AVAILABLE } from '@/lib/content-policy'
 
 export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 const dayFormatter = new Intl.DateTimeFormat('en-GB', { day: '2-digit', timeZone: 'UTC' })
 const monthFormatter = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' })
@@ -32,8 +34,10 @@ export default async function EventsPage() {
   return (
     <>
       <PageHeader
+        backgroundImage="/home/subpages/events-network.webp"
+        backgroundPosition="center 48%"
         title="Events"
-        lede="Networking-event announcements from the AGBN community."
+        lede="Illustrative networking-event announcements from the AGBN community."
       />
 
       {/*
@@ -53,7 +57,9 @@ export default async function EventsPage() {
             }
           />
         ) : (
-          <ol className="border-t border-hairline">
+          <>
+            <DemoContentNotice className="mb-7" />
+            <ol className="border-t border-hairline">
             {events.docs.map((event) => {
               const start = event.startDateTime ? new Date(event.startDateTime) : null
               const { label: status, open: isOpen } = eventPresentation(event)
@@ -121,7 +127,8 @@ export default async function EventsPage() {
                 </li>
               )
             })}
-          </ol>
+            </ol>
+          </>
         )}
       </Section>
     </>

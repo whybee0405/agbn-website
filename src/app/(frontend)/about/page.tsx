@@ -2,29 +2,27 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { Section } from '@/components/Section'
+import { PageHeader, Section } from '@/components/Section'
 import { Button } from '@/components/ui/button'
 
 export const revalidate = 3600
 export default function AboutPage() {
   return (
     <>
-      <Section tone="deep" rhythm="lg">
-        <div className="grid items-end gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-          <div>
-            <p className="mb-6 text-caption uppercase tracking-[0.15em] text-gold">About AGBN</p>
-            <h1 className="text-display-xl text-white">
-              Business travels
-              <br />
-              through people.
-            </h1>
-          </div>
-          <p className="max-w-md text-lede text-on-dark-muted">
-            A supplier you trust. A business that needs a partner. An introduction that opens a
-            door. That is where our network begins.
-          </p>
-        </div>
-      </Section>
+      <PageHeader
+        tone="deep"
+        backgroundImage="/home/subpages/about-network.webp"
+        backgroundPosition="center 50%"
+        titleSize="xl"
+        title={
+          <>
+            Business travels
+            <br />
+            through people.
+          </>
+        }
+        lede="A supplier you trust. A business that needs a partner. An introduction that opens a door. That is where our network begins."
+      />
       <Section tone="page" rhythm="lg">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div className="relative aspect-[4/3] overflow-hidden rounded-md">

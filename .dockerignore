@@ -7,3 +7,4 @@ Dockerfile
 Dockerfile.dev
 docker-compose.yml
 public/media
+src/seed/assets/gallery

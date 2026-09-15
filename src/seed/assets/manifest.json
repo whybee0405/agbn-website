@@ -59,11 +59,11 @@
       "alt": "A developer working at a multi-monitor desk in a Nairobi technology office while a colleague writes on a whiteboard."
     },
     {
-      "file": "seed-5.jpg",
-      "subject": "Agriculture & Agribusiness",
-      "country": "Ghana",
+      "file": "demo-agri.png",
+      "subject": "Demo agribusiness distribution opportunity",
+      "country": "Zambia",
       "generated": true,
-      "alt": "A farmer turning grain on a raised drying tray on a smallholding in Ghana, with a second farmer carrying a basket along the path behind."
+      "alt": "Two agricultural professionals checking grain sacks and produce crates at a smallholder distribution hub in Zambia."
     },
     {
       "file": "seed-6.jpg",
@@ -134,6 +134,41 @@
       "country": "Mozambique",
       "generated": true,
       "alt": "Early morning in a working commercial district of Maputo, Mozambique, with a vendor setting up a street stall."
+    },
+    {
+      "file": "demo-solar.png",
+      "subject": "Demo solar maintenance opportunity",
+      "country": "Kenya",
+      "generated": true,
+      "alt": "Two technicians seen from behind inspecting solar panels in a dry landscape at golden hour."
+    },
+    {
+      "file": "demo-logistics.png",
+      "subject": "Demo cold-chain opportunity",
+      "country": "South Africa",
+      "generated": true,
+      "alt": "Unbranded insulated cargo crates in a temperature-controlled warehouse."
+    },
+    {
+      "file": "demo-event.png",
+      "subject": "Demo networking event",
+      "country": "South Africa",
+      "generated": true,
+      "alt": "A small group in a thoughtful business discussion around a round table."
+    },
+    {
+      "file": "demo-referral.png",
+      "subject": "Demo referral story",
+      "country": "South Africa",
+      "generated": true,
+      "alt": "Two people exchanging an unbranded notebook across a dark wooden table."
+    },
+    {
+      "file": "demo-market.png",
+      "subject": "Demo market spotlight",
+      "country": "Ghana",
+      "generated": true,
+      "alt": "An early morning commercial district with people walking past market awnings."
     }
   ]
 }

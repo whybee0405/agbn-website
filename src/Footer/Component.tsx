@@ -13,11 +13,41 @@ const SOCIAL_LABELS: Record<string, string> = {
   whatsapp: 'WhatsApp',
 }
 
+// A new or restored database should never leave visitors at a dead-end. These
+// are public, owner-approved routes only. Legal links stay out until approved
+// policy pages are published in the CMS.
+const FALLBACK_LINK_GROUPS = [
+  {
+    groupTitle: 'Explore',
+    links: [
+      { link: { type: 'internal' as const, route: '/' as const, label: 'Home' } },
+      { link: { type: 'internal' as const, route: '/opportunities' as const, label: 'Opportunities' } },
+      { link: { type: 'internal' as const, route: '/about' as const, label: 'About AGBN' } },
+      { link: { type: 'internal' as const, route: '/pricing' as const, label: 'Membership' } },
+    ],
+  },
+  {
+    groupTitle: 'Network',
+    links: [
+      { link: { type: 'internal' as const, route: '/events' as const, label: 'Events' } },
+      { link: { type: 'internal' as const, route: '/case-studies' as const, label: 'Member stories' } },
+      { link: { type: 'internal' as const, route: '/gallery' as const, label: 'Gallery' } },
+      { link: { type: 'internal' as const, route: '/contact' as const, label: 'Contact' } },
+    ],
+  },
+] satisfies NonNullable<FooterType['linkGroups']>
+
 export async function Footer() {
   const [footer, settings] = await Promise.all([
     getCachedGlobal('footer', 1)() as Promise<FooterType>,
     getCachedGlobal('site-settings', 1)() as Promise<SiteSetting>,
   ])
+  const configuredLinkGroups = footer.linkGroups?.map((group) => ({
+    ...group,
+    links: group.links?.filter((item) => (item.link?.route as string) !== '/magazine'),
+  })).filter((group) => group.links?.length)
+  const linkGroups = configuredLinkGroups?.length ? configuredLinkGroups : FALLBACK_LINK_GROUPS
+
   return (
     <footer className="mt-auto bg-surface-deep text-on-dark">
       <div className="container">
@@ -58,7 +88,7 @@ export async function Footer() {
               ))}
             </div>
           </div>
-          {footer.linkGroups?.map((group, i) => (
+          {linkGroups.map((group, i) => (
             <nav key={i} aria-label={group.groupTitle || undefined}>
               <h2 className="mb-3 text-caption font-semibold uppercase tracking-[0.14em] text-gold">
                 {group.groupTitle}

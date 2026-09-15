@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { trackEvent } from '@/components/Analytics'
 import { runFormAction } from '@/lib/form-action'
+import { SADC_COUNTRIES } from '@/constants/countries'
 
 type Tier = { id: string; name: string }
 
@@ -104,7 +105,10 @@ export const JoinForm: React.FC<{ tiers: Tier[]; opportunity?: { title: string; 
         />
       </FormField>
       <FormField label="Country (optional)" htmlFor="join-country" error={errors.country?.message}>
-        <Input id="join-country" autoComplete="country-name" {...register('country')} />
+        <select id="join-country" autoComplete="country-name" {...register('country')} className="h-11 w-full rounded-md border border-input bg-surface-raised px-3.5 text-base text-on-surface transition-colors hover:border-on-surface-muted md:text-body-s">
+          <option value="">Select a country</option>
+          {SADC_COUNTRIES.map((country) => <option key={country} value={country}>{country}</option>)}
+        </select>
       </FormField>
       {tiers.length > 0 && (
         <FormField label="Which tier interests you?" htmlFor="join-tier">

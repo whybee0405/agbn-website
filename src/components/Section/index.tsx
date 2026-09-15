@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { cn } from '@/utilities/ui'
 
 /**
@@ -157,6 +158,10 @@ type PageHeaderProps = {
   title: React.ReactNode
   lede?: React.ReactNode
   tone?: Extract<SurfaceTone, 'brand' | 'deep'>
+  backgroundImage?: string
+  backgroundPosition?: string
+  backgroundFit?: 'cover' | 'contain'
+  titleSize?: 'l' | 'xl'
   /** Small factual strip under the lede: result counts, dates, locations. */
   meta?: React.ReactNode
   children?: React.ReactNode
@@ -171,15 +176,59 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   lede,
   tone = 'brand',
+  backgroundImage,
+  backgroundPosition = 'center center',
+  backgroundFit = 'cover',
+  titleSize = 'l',
   meta,
   children,
-}) => (
-  <Section as="header" tone={tone} rhythm="sm" className="relative overflow-hidden">
-    <div className="relative max-w-3xl">
-      <h1 className="text-display-l tracking-display-tight text-on-dark">{title}</h1>
+}) => {
+  const content = (
+    <div className="relative z-10 max-w-3xl">
+      <h1
+        className={cn(
+          titleSize === 'xl' ? 'text-display-xl' : 'text-display-l',
+          'tracking-display-tight text-on-dark',
+        )}
+      >
+        {title}
+      </h1>
       {lede && <p className="mt-4 text-lede text-on-dark-muted measure">{lede}</p>}
       {meta && <div className="mt-6 text-body-s text-on-dark-muted">{meta}</div>}
       {children && <div className="mt-8">{children}</div>}
     </div>
-  </Section>
-)
+  )
+
+  if (!backgroundImage) {
+    return (
+      <Section as="header" tone={tone} rhythm="sm" className="relative overflow-hidden">
+        {content}
+      </Section>
+    )
+  }
+
+  return (
+    <Section
+      as="header"
+      tone={tone}
+      rhythm="sm"
+      bleed
+      className="page-header-image-led relative isolate overflow-hidden"
+    >
+      <Image
+        src={backgroundImage}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        style={{ objectPosition: backgroundPosition }}
+        className={cn(
+          'page-header-image z-0',
+          backgroundFit === 'contain' ? 'object-contain' : 'object-cover',
+        )}
+      />
+      <div className="page-header-scrim absolute inset-0 z-[1]" aria-hidden="true" />
+      <div className="container relative z-10 w-full">{content}</div>
+    </Section>
+  )
+}

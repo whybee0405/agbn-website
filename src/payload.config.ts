@@ -18,6 +18,7 @@ import { CaseStudies } from './collections/CaseStudies'
 import { MemberLeads } from './collections/MemberLeads'
 import { ContactSubmissions } from './collections/ContactSubmissions'
 import { NewsletterSubscribers } from './collections/NewsletterSubscribers'
+import { Gallery } from './collections/Gallery'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { SiteSettings } from './globals/SiteSettings'
@@ -32,6 +33,12 @@ export default buildConfig({
   admin: {
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    components: {
+      graphics: {
+        Icon: '/components/AdminLogo/Icon',
+        Logo: '/components/AdminLogo',
+      },
     },
     user: Users.slug,
     livePreview: {
@@ -63,6 +70,10 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL,
     },
+    // This repository has no checked-in migrations. Opt in explicitly for a
+    // fresh self-hosted database; established installations should use
+    // migrations and leave this disabled.
+    push: process.env.PAYLOAD_DB_PUSH === 'true',
   }),
   collections: [
     Pages,
@@ -78,6 +89,7 @@ export default buildConfig({
     MemberLeads,
     ContactSubmissions,
     NewsletterSubscribers,
+    Gallery,
     Users,
   ],
   cors: [getServerSideURL()].filter(Boolean),

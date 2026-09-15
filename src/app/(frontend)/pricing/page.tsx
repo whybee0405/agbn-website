@@ -7,8 +7,12 @@ import { ArrowRight, Check } from 'lucide-react'
 import { EmptyState } from '@/components/EmptyState'
 import { PageHeader, Section } from '@/components/Section'
 import { Button } from '@/components/ui/button'
+import { getPricingPlanTone } from '@/utilities/pricingPlans'
 
 export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+
+const formatPlanPrice = (price: number) => `R${price}`
 
 export default async function PricingPage() {
   const payload = await getPayload({ config: configPromise })
@@ -23,6 +27,8 @@ export default async function PricingPage() {
     <>
       <PageHeader
         tone="deep"
+        backgroundImage="/home/gallery-tunis.jpg"
+        backgroundPosition="center 48%"
         title="Find your place in the network."
         lede="Start with connections. Add visibility as your business grows. Choose the membership that fits your next move."
       />
@@ -30,7 +36,7 @@ export default async function PricingPage() {
       <Section tone="sunken" rhythm="md" rhythmTop="sm">
         <div className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-hairline pb-6">
           <p className="text-body-m font-medium text-on-surface-heading">Apply today. Confirm your membership with the team.</p>
-          <p className="text-body-s text-on-surface-muted">Prices in USD. No payment taken on this site.</p>
+          <p className="text-body-s text-on-surface-muted">All fees are in South African rand (ZAR). No payment is taken on this site.</p>
         </div>
         {pricingPlans.docs.length === 0 ? (
           <EmptyState
@@ -43,48 +49,36 @@ export default async function PricingPage() {
             }
           />
         ) : (
-          <div className="grid grid-cols-1 items-stretch gap-5 md:grid-cols-3">
+          <div className="relative isolate grid grid-cols-1 items-stretch gap-5 overflow-hidden rounded-[2rem] border border-hairline bg-[radial-gradient(circle_at_15%_15%,rgba(37,99,235,0.12),transparent_31%),radial-gradient(circle_at_84%_78%,rgba(139,92,246,0.12),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.9),rgba(226,232,240,0.72))] p-3 shadow-[0_24px_80px_rgba(15,23,42,0.08)] md:grid-cols-3 md:gap-6 md:p-5">
             {pricingPlans.docs.map((plan) => {
-              const highlighted = Boolean(plan.highlighted)
+              const tone = getPricingPlanTone(plan.name)
+              const isGold = tone === 'gold'
+              const isDark = !isGold
+              const palette = {
+                blue: 'border-blue-300/30 bg-[linear-gradient(145deg,rgba(37,99,235,0.78),rgba(15,23,42,0.94)_72%)] text-white shadow-[0_24px_60px_rgba(30,64,175,0.24)]',
+                gold: 'border-amber-100/45 bg-[linear-gradient(145deg,rgba(255,236,179,0.72),rgba(204,164,59,0.82)_55%,rgba(154,111,15,0.88))] text-navy shadow-[0_24px_60px_rgba(133,89,8,0.22)]',
+                purple: 'border-violet-200/25 bg-[linear-gradient(145deg,rgba(139,92,246,0.72),rgba(67,35,128,0.9)_58%,rgba(29,20,58,0.96))] text-white shadow-[0_24px_60px_rgba(76,29,149,0.24)]',
+              }[tone]
               return (
                 <div
                   key={plan.id}
-                  className={
-                    highlighted
-                      ? 'flex min-w-0 flex-col rounded-lg border border-gold bg-surface-brand p-5 text-on-dark sm:p-7'
-                      : 'flex min-w-0 flex-col rounded-lg border border-hairline bg-surface-raised p-5 sm:p-7'
-                  }
+                  className={`relative isolate flex min-w-0 flex-col overflow-hidden rounded-[1.35rem] border p-5 backdrop-blur-xl before:pointer-events-none before:absolute before:inset-px before:-z-10 before:rounded-[1.28rem] before:bg-white/[0.07] before:shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] sm:p-7 ${palette} ${isGold ? 'md:-translate-y-3 md:shadow-[0_32px_72px_rgba(133,89,8,0.3)]' : ''}`}
                 >
-                  {highlighted && (
-                    <p className="mb-3 font-mono text-caption uppercase tracking-[0.14em] text-gold">
-                      More visibility
-                    </p>
-                  )}
-                  <h2 className={highlighted ? 'text-display-m text-on-dark' : 'text-display-m text-on-surface-heading'}>
-                    {plan.name}
-                  </h2>
-                  <p
-                    className={
-                      highlighted
-                        ? 'mt-2 text-body-s text-on-dark-muted'
-                        : 'mt-2 text-body-s text-on-surface-muted'
-                    }
-                  >
-                    {plan.tagline}
-                  </p>
+                  <span aria-hidden="true" className={`absolute -right-14 -top-14 -z-10 size-44 rounded-full blur-3xl ${isGold ? 'bg-white/35' : 'bg-white/15'}`} />
+                  <span aria-hidden="true" className={`absolute -bottom-20 -left-14 -z-10 size-40 rounded-full blur-3xl ${isGold ? 'bg-amber-950/25' : tone === 'blue' ? 'bg-cyan-300/20' : 'bg-fuchsia-400/15'}`} />
+                  <h2 className="text-display-m">{plan.name}</h2>
+                  <p className={`mt-2 text-body-s ${isGold ? 'text-navy/75' : 'text-white/75'}`}>{plan.tagline}</p>
 
-                  <p className="mt-7 tabular text-display-l">
-                    ${plan.price}
-                    <span className="text-body-l">/{plan.billingPeriod}</span>
+                  <p className="mt-7 flex flex-wrap items-baseline gap-x-1 tabular text-display-l">
+                    {formatPlanPrice(plan.price)}
+                    <span className="whitespace-nowrap text-body-l">/month</span>
                   </p>
                   {plan.localPriceEstimate && (
                     /* Muted price context has to follow the surface. On the
                        navy card the light-surface muted token measured ~2.6:1. */
                     <p
                       className={
-                        highlighted
-                          ? 'mt-1 text-caption text-on-dark-muted'
-                          : 'mt-1 text-caption text-on-surface-muted'
+                        isDark ? 'mt-1 text-caption text-white/70' : 'mt-1 text-caption text-navy/70'
                       }
                     >
                       {plan.localPriceEstimate}
@@ -98,10 +92,10 @@ export default async function PricingPage() {
                           size={16}
                           aria-hidden="true"
                           className={
-                            highlighted ? 'mt-1 shrink-0 text-gold' : 'mt-1 shrink-0 text-savanna'
+                            isGold ? 'mt-1 shrink-0 text-navy' : 'mt-1 shrink-0 text-white'
                           }
                         />
-                        <span className={highlighted ? 'text-on-dark-muted' : 'text-on-surface'}>
+                        <span className={isGold ? 'text-navy' : 'text-white/85'}>
                           {f.feature}
                         </span>
                       </li>
@@ -124,9 +118,7 @@ export default async function PricingPage() {
                   {plan.ctaText && (
                     <p
                       className={
-                        highlighted
-                          ? 'mt-9 text-body-s text-gold'
-                          : 'mt-9 text-body-s text-on-surface-accent'
+                        isGold ? 'mt-9 text-body-s italic text-navy/80' : 'mt-9 text-body-s italic text-white/80'
                       }
                     >
                       {plan.ctaText}
@@ -134,9 +126,9 @@ export default async function PricingPage() {
                   )}
                   <Button
                     asChild
-                    variant={highlighted ? 'gold' : 'outline'}
+                    variant={isGold ? 'outline' : 'onDark'}
                     size="lg"
-                    className="mt-3 w-full text-body-s"
+                    className={isGold ? 'mt-3 w-full border-navy/60 bg-transparent text-body-s text-navy hover:border-navy hover:bg-navy hover:text-white' : 'mt-3 w-full text-body-s'}
                   >
                     <Link href={`/join?tier=${plan.id}`}>
                       Apply for {plan.name}
@@ -188,8 +180,8 @@ export default async function PricingPage() {
                 a: 'No. Every tier connects you to the same network and the same opportunity feed. Higher tiers add priority introductions, visibility and access, not more members.',
               },
               {
-                q: 'Which currency am I charged in?',
-                a: 'Tiers are priced in US dollars. The figure under each price is an approximate local equivalent and will move with the exchange rate.',
+                q: 'Which currency are membership fees quoted in?',
+                a: 'All membership fees are quoted in and collected in South African rand (ZAR). The amount shown on each tier is the applicable monthly fee.',
               },
             ].map((item) => (
               <div key={item.q} className="py-6">
@@ -208,6 +200,6 @@ export function generateMetadata(): Metadata {
   return {
     title: 'Pricing',
     description:
-      'Compare AGBN membership tiers, Africa Connect, Africa Grow, and Africa Elite, and find the right fit for your business.',
+      'Compare AGBN membership tiers, Connect, Grow, and Grow Pro Max, and find the right fit for your business.',
   }
 }

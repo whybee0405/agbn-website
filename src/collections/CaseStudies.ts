@@ -11,6 +11,7 @@ import {
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
 import { slugField } from '../fields/slug'
+import { SADC_COUNTRY_OPTIONS } from '../constants/countries'
 
 export const CaseStudies: CollectionConfig = {
   slug: 'case-studies',
@@ -46,8 +47,9 @@ export const CaseStudies: CollectionConfig = {
         },
         {
           name: 'country',
-          type: 'text',
+          type: 'select',
           required: true,
+          options: SADC_COUNTRY_OPTIONS,
           admin: { width: '50%' },
         },
       ],
@@ -68,6 +70,24 @@ export const CaseStudies: CollectionConfig = {
       name: 'summary',
       type: 'textarea',
       required: true,
+    },
+    {
+      name: 'youtubeUrl',
+      label: 'YouTube video URL',
+      type: 'text',
+      admin: {
+        description: 'Optional. Paste a YouTube or youtu.be link to embed the video on this case study.',
+      },
+      validate: (value: unknown) => {
+        if (!value) return true
+        if (typeof value !== 'string') return 'Use a valid YouTube or youtu.be URL.'
+        try {
+          const hostname = new URL(value).hostname.replace(/^www\./, '')
+          return hostname === 'youtube.com' || hostname === 'm.youtube.com' || hostname === 'youtu.be' || 'Use a valid YouTube or youtu.be URL.'
+        } catch {
+          return 'Use a valid YouTube or youtu.be URL.'
+        }
+      },
     },
     {
       name: 'body',

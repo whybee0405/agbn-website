@@ -18,6 +18,10 @@ import { clashDisplay, generalSans, azeretMono } from '@/fonts'
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
+// Header, footer, and page content are CMS-backed. Render at request time so
+// image builds do not need database access and published CMS changes are live.
+export const dynamic = 'force-dynamic'
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
 

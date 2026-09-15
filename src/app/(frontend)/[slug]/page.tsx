@@ -10,21 +10,7 @@ import RichText from '@/components/RichText'
 import { generateMeta } from '@/utilities/generateMeta'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
-// Only flexible/legal pages (Privacy, Terms) live in the `pages` collection —
-// every other route in the IA has its own dedicated template (see Section 6.1).
-export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const pages = await payload.find({
-    collection: 'pages',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: { slug: true },
-  })
-
-  return pages.docs?.map(({ slug }) => ({ slug })) || []
-}
+export const dynamic = 'force-dynamic'
 
 type Args = {
   params: Promise<{ slug?: string }>

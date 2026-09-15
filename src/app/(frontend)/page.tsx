@@ -7,16 +7,19 @@ import { ArrowDown, ArrowRight, MoveUpRight } from 'lucide-react'
 import { HeroParallax } from '@/components/HeroParallax'
 import { ReferralJourney } from '@/components/ReferralJourney'
 import { Media } from '@/components/Media'
+import { GalleryGallery } from '@/components/GalleryGallery'
 import { Section, SectionHeading } from '@/components/Section'
 import { SectorIcon } from '@/components/SectorIcon'
 import { Button } from '@/components/ui/button'
 import { PUBLISHED_OPPORTUNITIES_AVAILABLE } from '@/lib/content-policy'
+import { getPricingPlanTone } from '@/utilities/pricingPlans'
 
 export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
-  const [sectors, plans, opportunities] = await Promise.all([
+  const [sectors, plans, opportunities, gallery] = await Promise.all([
     payload.find({ collection: 'sectors', limit: 100, overrideAccess: false }),
     payload.find({ collection: 'pricing-plans', limit: 3, sort: 'order', overrideAccess: false }),
     payload.find({
@@ -26,6 +29,13 @@ export default async function HomePage() {
       sort: '-datePosted',
       overrideAccess: false,
       where: { listingStatus: { not_equals: 'closed' } },
+    }),
+    payload.find({
+      collection: 'gallery',
+      depth: 1,
+      limit: 12,
+      sort: ['order', '-updatedAt'],
+      overrideAccess: false,
     }),
   ])
   return (
@@ -181,6 +191,21 @@ export default async function HomePage() {
         <ReferralJourney />
       </Section>
 
+      {gallery.docs.length > 0 && (
+        <Section tone="page" rhythm="md" id="gallery" bleed>
+          <div className="container mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-caption font-medium uppercase tracking-[0.16em] text-on-surface-accent">In the network</p>
+              <h2 className="mt-3 text-display-l tracking-display-tight text-on-surface-heading">The connections behind the work.</h2>
+            </div>
+            <Link href="/gallery" className="inline-flex min-h-11 items-center gap-2 text-body-s font-medium text-on-surface underline decoration-gold underline-offset-4">
+              View the full gallery <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+          <GalleryGallery items={gallery.docs} variant="ticker" />
+        </Section>
+      )}
+
       {sectors.docs.length > 0 && (
         <Section tone="page" rhythm="md">
           <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
@@ -199,18 +224,18 @@ export default async function HomePage() {
                 <li key={sector.id} className="border-b border-hairline">
                   <Link
                     href={`/opportunities?sector=${sector.slug}`}
-                    className="group flex min-h-16 items-center gap-3 py-4 text-body-m"
+                    className="group flex min-h-16 items-center gap-3 py-4 text-body-m text-on-surface-heading transition-colors duration-300 hover:text-savanna motion-reduce:transition-none"
                   >
                     <SectorIcon
                       name={sector.icon}
                       size={19}
-                      className="shrink-0 text-on-surface-muted"
+                      className="shrink-0 text-on-surface-muted transition-colors duration-300 group-hover:text-savanna motion-reduce:transition-none"
                     />
                     <span className="font-medium">{sector.name}</span>
                     <MoveUpRight
                       size={15}
                       aria-hidden="true"
-                      className="ml-auto shrink-0 text-on-surface-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                      className="ml-auto shrink-0 text-on-surface-muted transition-[color,transform] duration-300 group-hover:rotate-45 group-hover:text-savanna motion-reduce:transition-none"
                     />
                   </Link>
                 </li>
@@ -230,30 +255,23 @@ export default async function HomePage() {
             lede="Choose the membership that fits your business. Apply first; the team will confirm your tier and payment details with you."
           />
           <div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-white/20 bg-white/20 md:grid-cols-3">
-            {plans.docs.map((plan) => (
-              <div
-                key={plan.id}
-                className={`flex min-w-0 flex-col p-6 sm:p-8 ${plan.highlighted ? 'bg-navy' : 'bg-midnight'}`}
-              >
-                <p className="mb-6 text-caption font-medium uppercase tracking-[0.14em] text-gold">
-                  {plan.highlighted
-                    ? 'Build your visibility'
-                    : plan.name.toLowerCase().includes('elite')
-                      ? 'Extend your reach'
-                      : 'Start connecting'}
-                </p>
-                <h3 className="text-display-m text-white">{plan.name}</h3>
-                <p className="mt-2 text-body-s text-on-dark-muted">{plan.tagline}</p>
-                <p className="mb-5 mt-4 font-display text-display-l font-medium text-white md:mb-7 md:mt-7">
-                  ${plan.price}
-                  <span className="ml-1 font-sans text-body-s font-normal text-on-dark-muted">
-                    USD / {plan.billingPeriod}
+            {plans.docs.map((plan) => {
+              const tone = getPricingPlanTone(plan.name)
+              const isGold = tone === 'gold'
+              return <div key={plan.id} className={`relative isolate flex min-w-0 flex-col overflow-hidden p-6 backdrop-blur-xl before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-white/[0.05] before:shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] sm:p-8 ${tone === 'blue' ? 'bg-[linear-gradient(145deg,rgba(37,99,235,0.78),rgba(15,23,42,0.94)_72%)] text-white' : tone === 'purple' ? 'bg-[linear-gradient(145deg,rgba(139,92,246,0.72),rgba(29,20,58,0.96))] text-white' : 'bg-[linear-gradient(145deg,rgba(255,236,179,0.72),rgba(204,164,59,0.88))] text-navy'}`}>
+                <span aria-hidden="true" className={`absolute -right-12 -top-12 -z-10 size-36 rounded-full blur-3xl ${isGold ? 'bg-white/35' : 'bg-white/15'}`} />
+                <h3 className="text-display-m">{plan.name}</h3>
+                <p className={`mt-2 text-body-s ${isGold ? 'text-navy/75' : 'text-white/75'}`}>{plan.tagline}</p>
+                <p className="mb-5 mt-4 font-display text-display-l font-medium md:mb-7 md:mt-7">
+                  {`R${plan.price}`}
+                  <span className={`ml-1 font-sans text-body-s font-normal ${isGold ? 'text-navy/75' : 'text-white/75'}`}>
+                    /month
                   </span>
                 </p>
-                <ul className="mb-8 hidden space-y-3 border-t border-white/15 pt-6 text-body-s text-on-dark-muted md:block">
+                <ul className={`mb-8 hidden space-y-3 border-t pt-6 text-body-s md:block ${isGold ? 'border-navy/20 text-navy/85' : 'border-white/15 text-white/80'}`}>
                   {plan.features?.slice(0, 3).map((feature, i) => (
                     <li key={i} className="flex gap-3">
-                      <span aria-hidden="true" className="text-gold">
+                      <span aria-hidden="true" className={isGold ? 'text-navy' : 'text-white'}>
                         ↗
                       </span>
                       {feature.feature}
@@ -262,15 +280,15 @@ export default async function HomePage() {
                 </ul>
                 <Button
                   asChild
-                  variant={plan.highlighted ? 'gold' : 'onDark'}
-                  className="mt-auto w-full"
+                  variant={isGold ? 'outline' : 'onDark'}
+                  className={isGold ? 'mt-auto w-full border-navy/60 bg-transparent text-navy hover:border-navy hover:bg-navy hover:text-white' : 'mt-auto w-full'}
                 >
                   <Link href={`/join?tier=${plan.id}`}>
                     Choose {plan.name} <ArrowRight />
                   </Link>
                 </Button>
               </div>
-            ))}
+            })}
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-body-s">
             <p className="text-on-dark-muted">No payment is taken with your application.</p>
@@ -343,13 +361,29 @@ export default async function HomePage() {
           </figure>
         </div>
       </Section>
-      <Section tone="page" rhythm="lg">
-        <div className="grid items-end gap-8 lg:grid-cols-[1fr_auto]">
+      <Section
+        tone="deep"
+        rhythm="none"
+        bleed
+        className="relative isolate overflow-hidden"
+      >
+        <Image
+          src="/home/cta-network-night.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="z-0 object-cover object-[center_68%]"
+        />
+        <div
+          className="absolute inset-0 z-[1] bg-[linear-gradient(90deg,rgba(4,24,45,0.96)_0%,rgba(4,24,45,0.82)_52%,rgba(4,24,45,0.56)_100%)]"
+          aria-hidden="true"
+        />
+        <div className="container relative z-10 grid items-end gap-10 py-20 sm:py-24 lg:grid-cols-[1fr_auto] lg:py-32">
           <div>
-            <p className="mb-5 text-body-s text-on-surface-accent">
+            <p className="mb-5 text-body-s text-gold">
               Your next introduction starts with a conversation.
             </p>
-            <h2 className="max-w-3xl text-display-xl text-on-surface-heading">
+            <h2 className="max-w-3xl text-display-xl text-white">
               Who could you
               <br />
               connect next?
@@ -361,9 +395,9 @@ export default async function HomePage() {
                 Let’s get you connected <ArrowRight />
               </Link>
             </Button>
-            <p className="mt-4 text-body-s text-on-surface-muted">
+            <p className="mt-4 text-body-s text-on-dark-muted">
               Not sure where to start?{' '}
-              <Link href="/contact" className="underline underline-offset-4">
+              <Link href="/contact" className="text-white underline decoration-gold underline-offset-4">
                 Talk to us.
               </Link>
             </p>

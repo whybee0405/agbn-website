@@ -12,6 +12,7 @@ import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
 import { slugField } from '../fields/slug'
+import { SADC_COUNTRY_OPTIONS } from '../constants/countries'
 
 export const Opportunities: CollectionConfig = {
   slug: 'opportunities',
@@ -47,8 +48,9 @@ export const Opportunities: CollectionConfig = {
         },
         {
           name: 'country',
-          type: 'text',
+          type: 'select',
           required: true,
+          options: SADC_COUNTRY_OPTIONS,
         },
       ],
     },

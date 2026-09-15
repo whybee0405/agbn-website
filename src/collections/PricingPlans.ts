@@ -38,11 +38,8 @@ export const PricingPlans: CollectionConfig = {
           name: 'currency',
           type: 'select',
           required: true,
-          defaultValue: 'USD',
-          options: [
-            { label: 'USD', value: 'USD' },
-            { label: 'ZAR', value: 'ZAR' },
-          ],
+          defaultValue: 'ZAR',
+          options: [{ label: 'ZAR — South African rand', value: 'ZAR' }],
           admin: { width: '33%' },
         },
         {
@@ -62,7 +59,7 @@ export const PricingPlans: CollectionConfig = {
       name: 'localPriceEstimate',
       type: 'text',
       admin: {
-        description: 'e.g. "± R450 /month". Shown alongside the USD figure.',
+        description: 'Optional supporting note shown below the price. Leave blank when the price above is the final ZAR fee.',
       },
     },
     {

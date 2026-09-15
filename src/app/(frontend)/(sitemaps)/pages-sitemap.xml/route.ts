@@ -17,7 +17,6 @@ const getPagesSitemap = unstable_cache(
       'about',
       'pricing',
       'events',
-      'magazine',
       'case-studies',
       'contact',
       'join',

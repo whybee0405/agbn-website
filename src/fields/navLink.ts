@@ -9,7 +9,7 @@ export const SITE_ROUTES: { label: string; value: string }[] = [
   { label: 'About', value: '/about' },
   { label: 'Pricing', value: '/pricing' },
   { label: 'Events', value: '/events' },
-  { label: 'Magazine', value: '/magazine' },
+  { label: 'Gallery', value: '/gallery' },
   { label: 'Case Studies', value: '/case-studies' },
   { label: 'Contact', value: '/contact' },
   { label: 'Join AGBN', value: '/join' },

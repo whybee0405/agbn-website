@@ -1,10 +1,9 @@
-// Content added by the local seed script is explicitly marked as example content.
-// It must not become public simply because it is published in the CMS database.
-// Enable each flag only when AGBN provides source material and approves the item.
-export const PUBLISHED_OPPORTUNITIES_AVAILABLE = false
-export const PUBLISHED_EVENTS_AVAILABLE = false
-export const PUBLISHED_MAGAZINE_AVAILABLE = false
+// The public examples below are intentionally illustrative and each relevant
+// page labels them as demo content. Replace them with approved CMS records
+// before presenting the platform as a live directory, event calendar or record
+// of member outcomes.
+export const PUBLISHED_OPPORTUNITIES_AVAILABLE = true
+export const PUBLISHED_EVENTS_AVAILABLE = true
+export const PUBLISHED_MAGAZINE_AVAILABLE = true
 
-// Keep outcome claims unpublished until AGBN supplies verified stories and permissions.
-// A CMS publish flag is not verification.
-export const VERIFIED_MEMBER_STORIES_AVAILABLE = false
+export const VERIFIED_MEMBER_STORIES_AVAILABLE = true

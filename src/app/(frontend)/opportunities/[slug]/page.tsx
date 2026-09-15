@@ -11,8 +11,10 @@ import { RelatedItems, type RelatedItem } from '@/components/RelatedItems'
 import { Button } from '@/components/ui/button'
 import { generateMeta } from '@/utilities/generateMeta'
 import { PUBLISHED_OPPORTUNITIES_AVAILABLE } from '@/lib/content-policy'
+import { DemoContentNotice } from '@/components/DemoContentNotice'
 
 export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 type Args = {
   params: Promise<{ slug: string }>
@@ -29,18 +31,6 @@ const queryOpportunityBySlug = cache(async (slug: string) => {
   })
   return result.docs?.[0] || null
 })
-
-export async function generateStaticParams() {
-  if (!PUBLISHED_OPPORTUNITIES_AVAILABLE) return []
-  const payload = await getPayload({ config: configPromise })
-  const opportunities = await payload.find({
-    collection: 'opportunities',
-    limit: 1000,
-    pagination: false,
-    select: { slug: true },
-  })
-  return opportunities.docs.map(({ slug }) => ({ slug }))
-}
 
 export default async function OpportunityPage({ params: paramsPromise }: Args) {
   if (!PUBLISHED_OPPORTUNITIES_AVAILABLE) return notFound()
@@ -112,6 +102,7 @@ export default async function OpportunityPage({ params: paramsPromise }: Args) {
 
       <div className="container mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
         <div>
+          <DemoContentNotice className="mb-8" />
           {opportunity.listingStatus === 'closed' && (
             <p
               role="status"

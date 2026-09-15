@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
+import { MessageCircleIcon } from 'lucide-react'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -9,6 +10,7 @@ import { PageHeader, Section } from '@/components/Section'
 import { getOpportunityContext } from '@/utilities/getOpportunityContext'
 
 export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 /** Sets expectations before the form, so nobody submits wondering what happens. */
 const WHAT_HAPPENS_NEXT = [
@@ -16,6 +18,8 @@ const WHAT_HAPPENS_NEXT = [
   'A member of the AGBN team calls you within two business days.',
   'Once you are confirmed, your directory listing and opportunity feed go live.',
 ]
+
+const WHATSAPP_GROUP_URL = 'https://chat.whatsapp.com/BRnfMQiLnuI04bsvTolanM?s=cl&p=i&mlu=4&ilr=4'
 
 export default async function JoinPage({ searchParams }: { searchParams: Promise<{ opportunity?: string }> }) {
   const opportunity = await getOpportunityContext((await searchParams).opportunity)
@@ -26,6 +30,11 @@ export default async function JoinPage({ searchParams }: { searchParams: Promise
     sort: 'order',
     overrideAccess: false,
   })
+  const siteSettings = await payload.findGlobal({
+    slug: 'site-settings',
+    overrideAccess: false,
+  })
+  const whatsappGroupUrl = siteSettings.whatsappGroupUrl || WHATSAPP_GROUP_URL
 
   return (
     <>
@@ -59,6 +68,22 @@ export default async function JoinPage({ searchParams }: { searchParams: Promise
                 </li>
               ))}
             </ol>
+
+            <div className="mt-8 border-t border-hairline pt-6">
+              <p className="text-body-s text-on-surface-muted">
+                Already part of the conversation?
+              </p>
+              <a
+                href={whatsappGroupUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex min-h-11 items-center gap-2 text-body-s font-semibold text-on-surface-heading underline decoration-gold decoration-2 underline-offset-4 transition-colors hover:text-on-surface-accent"
+              >
+                <MessageCircleIcon className="size-5" aria-hidden="true" />
+                Join the WhatsApp group
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </div>
           </aside>
         </div>
       </Section>

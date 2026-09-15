@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { SADC_COUNTRIES } from '@/constants/countries'
 
 const requiredString = (label: string) =>
   z.string().trim().min(1, { message: `${label} is required.` })
@@ -19,7 +20,7 @@ export const joinSchema = z.object({
   name: requiredString('Your name'),
   email: z.string().trim().email({ message: 'Enter a valid email address.' }),
   phone: requiredString('Phone number'),
-  country: z.string().trim().optional(),
+  country: z.union([z.literal(''), z.enum(SADC_COUNTRIES)]).optional().transform((value) => value || undefined),
   selectedTier: z.string().trim().optional(),
   message: z.string().trim().optional(),
 })

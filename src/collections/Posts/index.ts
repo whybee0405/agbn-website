@@ -12,6 +12,7 @@ import {
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { slugField } from '../../fields/slug'
+import { SADC_COUNTRY_OPTIONS } from '../../constants/countries'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
@@ -51,6 +52,9 @@ export const Posts: CollectionConfig = {
     },
   },
   admin: {
+    // Magazine publishing has been retired. Keep records in the database for
+    // now, but remove the collection from the CMS navigation and public site.
+    hidden: true,
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
@@ -117,7 +121,8 @@ export const Posts: CollectionConfig = {
                 },
                 {
                   name: 'country',
-                  type: 'text',
+                  type: 'select',
+                  options: SADC_COUNTRY_OPTIONS,
                   admin: { width: '33%' },
                 },
               ],

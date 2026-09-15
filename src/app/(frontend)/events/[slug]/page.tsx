@@ -13,8 +13,10 @@ import { RelatedItems, type RelatedItem } from '@/components/RelatedItems'
 import { generateMeta } from '@/utilities/generateMeta'
 import { eventPresentation, eventDate } from '@/utilities/eventPresentation'
 import { PUBLISHED_EVENTS_AVAILABLE } from '@/lib/content-policy'
+import { DemoContentNotice } from '@/components/DemoContentNotice'
 
 export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 const formatEventDate = (value?: string | null) =>
   value ? eventDate.format(new Date(value)) : ''
@@ -39,18 +41,6 @@ const queryEventBySlug = cache(async (slug: string) => {
   })
   return result.docs?.[0] || null
 })
-
-export async function generateStaticParams() {
-  if (!PUBLISHED_EVENTS_AVAILABLE) return []
-  const payload = await getPayload({ config: configPromise })
-  const events = await payload.find({
-    collection: 'events',
-    limit: 1000,
-    pagination: false,
-    select: { slug: true },
-  })
-  return events.docs.map(({ slug }) => ({ slug }))
-}
 
 export default async function EventPage({ params: paramsPromise }: Args) {
   if (!PUBLISHED_EVENTS_AVAILABLE) return notFound()
@@ -98,6 +88,7 @@ export default async function EventPage({ params: paramsPromise }: Args) {
 
       <div className="container mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16">
         <div>
+          <DemoContentNotice className="mb-8" />
           <dl className="mb-10 grid gap-5 border-b border-hairline pb-8 sm:grid-cols-2">
             <div>
               <dt className="flex items-center gap-2 text-caption font-semibold uppercase tracking-[0.16em] text-on-surface-accent">

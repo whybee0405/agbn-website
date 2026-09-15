@@ -24,7 +24,9 @@ const HeaderNavigation: React.FC<HeaderClientProps> = ({ data, siteSettings }) =
   const [open, setOpen] = useState(false)
   const menuButton = useRef<HTMLButtonElement>(null)
   const pathname = usePathname()
-  const navItems = data?.navItems || []
+  // A legacy CMS global may still contain this retired route. Hide it until the
+  // next settings edit removes the stored row as well.
+  const navItems = (data?.navItems || []).filter((item) => (item.link?.route as string) !== '/magazine')
   const ctaLabel = data?.ctaLabel || 'Join AGBN'
 
   // A nonmodal disclosure: focus can leave, which closes the panel. Route keys reset it.

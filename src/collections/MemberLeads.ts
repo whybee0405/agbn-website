@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import { SADC_COUNTRY_OPTIONS } from '../constants/countries'
 
 export const MemberLeads: CollectionConfig = {
   slug: 'member-leads',
@@ -23,7 +24,7 @@ export const MemberLeads: CollectionConfig = {
     { name: 'name', type: 'text', required: true },
     { name: 'email', type: 'email', required: true },
     { name: 'phone', type: 'text', required: true },
-    { name: 'country', type: 'text' },
+    { name: 'country', type: 'select', options: SADC_COUNTRY_OPTIONS },
     {
       name: 'selectedTier',
       type: 'relationship',
